@@ -23,7 +23,7 @@ services:
     image: redis:7-alpine
     container_name: siagakita_redis
     restart: always
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD} --notify-keyspace-events Ex
     env_file:
       - .env
     ports:
