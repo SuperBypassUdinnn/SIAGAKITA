@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'biodata_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -43,8 +44,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _register() {
-    // Simulasi daftar selesai
-    Navigator.of(context).pop(); // Kembali ke Login
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => BiodataScreen()),
+    );
   }
 
   @override
@@ -104,7 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   shadowColor: primaryColor.withValues(alpha: 0.5),
                 ),
                 child: Text(
-                  _currentStep == 3 ? 'Selesai Daftar' : 'Lanjut',
+                  _currentStep == 3 ? 'Lanjut Isi Biodata' : 'Lanjut',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

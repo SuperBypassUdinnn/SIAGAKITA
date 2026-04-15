@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../main.dart'; // To access SiagaKitaApp.themeNotifier
+import 'report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -223,36 +224,44 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   Row(
                     children: [
                       Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.all(20),
-                          decoration: BoxDecoration(
-                            color: colors.surface,
-                            borderRadius: BorderRadius.circular(24),
-                            boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
-                          ),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: colors.secondary.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(16),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => ReportScreen()),
+                            );
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color: colors.surface,
+                              borderRadius: BorderRadius.circular(24),
+                              boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                            ),
+                            child: Column(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: colors.secondary.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Icon(Icons.description_outlined,
+                                      color: colors.secondary, size: 28),
                                 ),
-                                child: Icon(Icons.description_outlined,
-                                    color: colors.secondary, size: 28),
-                              ),
-                              const SizedBox(height: 12),
-                              Text('Laporkan',
-                                  style: TextStyle(
-                                      color: colors.onBackground,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14)),
-                              const SizedBox(height: 4),
-                              Text('Kirim bukti & titik\nlokasi',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: colors.onBackground.withValues(alpha: 0.5), fontSize: 10)),
-                            ],
+                                const SizedBox(height: 12),
+                                Text('Laporkan',
+                                    style: TextStyle(
+                                        color: colors.onBackground,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14)),
+                                const SizedBox(height: 4),
+                                Text('Kirim bukti & titik\nlokasi',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: colors.onBackground.withValues(alpha: 0.5), fontSize: 10)),
+                              ],
+                            ),
                           ),
                         ),
                       ),

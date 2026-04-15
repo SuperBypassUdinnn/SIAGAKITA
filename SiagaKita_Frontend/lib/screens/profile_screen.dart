@@ -117,12 +117,29 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.favorite, color: Colors.red, size: 18),
+                        const Icon(Icons.location_on, color: Colors.blue, size: 18),
                         const SizedBox(width: 8),
-                        Text('Kontak Darurat', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
+                        Text('Domisili & Kontak Darurat', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: colors.onSurface.withValues(alpha: 0.05)),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('ALAMAT LENGKAP', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                          const SizedBox(height: 4),
+                          Text('Jl. Cut Nyak Dhien No. 44, Peukan Bada, Kabupaten Aceh Besar, Aceh 23351', style: TextStyle(color: colors.onSurface, fontSize: 13, height: 1.4)),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -132,23 +149,27 @@ class ProfileScreen extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(color: Colors.blue[900]?.withValues(alpha: 0.1), shape: BoxShape.circle),
-                                child: const Icon(Icons.person, color: Colors.blueAccent, size: 18),
-                              ),
-                              const SizedBox(width: 12),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Siti Aminah (Istri)', style: TextStyle(color: colors.onSurface, fontSize: 12, fontWeight: FontWeight.bold)),
-                                  Text('0812-3456-7890', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 10)),
-                                ],
-                              )
-                            ],
+                          Expanded(
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(color: Colors.blue[900]?.withValues(alpha: 0.1), shape: BoxShape.circle),
+                                  child: const Icon(Icons.person, color: Colors.blueAccent, size: 18),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Siti Aminah (Wali)', style: TextStyle(color: colors.onSurface, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      Text('0812-3456-7890', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 10)),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                           Container(
                             padding: const EdgeInsets.all(8),
