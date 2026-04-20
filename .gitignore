@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -22,3 +23,125 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+=======
+# ==============================================================================
+# 1. KREDENSIAL & RAHASIA (SANGAT KRUSIAL)
+# ==============================================================================
+# Jangan pernah commit file .env ke repository!
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+# Izinkan .env.example sebagai template untuk tim
+!.env.example
+*.pem
+*.key
+*.cert
+
+# ==============================================================================
+# 2. INFRASTRUKTUR (DOCKER & DATABASE)
+# ==============================================================================
+# Abaikan folder volume database lokal agar tidak memakan memori repository
+infrastructure/postgres-data/
+infrastructure/redis-data/
+infrastructure/pgadmin/
+dump.rdb
+*.sql.gz
+
+# ==============================================================================
+# 3. BACKEND: GOLANG
+# ==============================================================================
+# Folder build & binary
+backend-go/bin/
+backend-go/build/
+backend-go/tmp/
+backend-go/out/
+
+# Hasil test dan coverage
+backend-go/coverage.out
+backend-go/coverage.html
+
+# File eksekusi OS (jika di-build lokal)
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+
+# ==============================================================================
+# 4. FRONTEND: FLUTTER & NATIVE (KOTLIN/SWIFT)
+# ==============================================================================
+# Miscellaneous Flutter
+*.class
+*.log
+*.pyc
+*.swp
+.lock
+.macbsd
+app.*.symbols
+profile.json
+
+# Dart tool & cache
+**/mobile-flutter/.dart_tool/
+**/mobile-flutter/.packages
+**/mobile-flutter/build/
+**/mobile-flutter/.pub-cache/
+**/mobile-flutter/.pub/
+
+# Android (Kotlin/Java) Build & Keystore
+**/mobile-flutter/android/app/build/
+**/mobile-flutter/android/.gradle/
+**/mobile-flutter/android/captures/
+**/mobile-flutter/android/gradlew
+**/mobile-flutter/android/gradlew.bat
+**/mobile-flutter/android/local.properties
+**/mobile-flutter/android/**/GeneratedPluginRegistrant.java
+**/mobile-flutter/android/**/*.keystore
+**/mobile-flutter/android/**/*.jks
+
+# iOS (Swift/Objective-C) Build & Pods
+**/mobile-flutter/ios/Flutter/App.framework
+**/mobile-flutter/ios/Flutter/Flutter.framework
+**/mobile-flutter/ios/Flutter/Flutter.podspec
+**/mobile-flutter/ios/Flutter/Generated.xcconfig
+**/mobile-flutter/ios/Flutter/app.flx
+**/mobile-flutter/ios/Flutter/app.zip
+**/mobile-flutter/ios/Flutter/flutter_assets/
+**/mobile-flutter/ios/Flutter/flutter_export_environment.sh
+**/mobile-flutter/ios/Pods/
+**/mobile-flutter/ios/.symlinks/
+**/mobile-flutter/ios/**/*.pbxuser
+**/mobile-flutter/ios/**/*.mode1v3
+**/mobile-flutter/ios/**/*.mode2v3
+**/mobile-flutter/ios/**/*.pbxproj.local
+**/mobile-flutter/ios/**/*.xcworkspace/xcuserdata/
+
+# Web / Desktop (Jika ter-generate)
+**/mobile-flutter/windows/flutter/ephemeral/
+**/mobile-flutter/windows/flutter/generated_plugin_registrant.cc
+**/mobile-flutter/linux/flutter/ephemeral/
+**/mobile-flutter/linux/flutter/generated_plugin_registrant.cc
+**/mobile-flutter/macos/Flutter/ephemeral/
+
+# ==============================================================================
+# 5. OS & IDE (SISTEM LOKAL)
+# ==============================================================================
+# Mac OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDEs (VS Code, Android Studio, IntelliJ)
+.vscode/
+.idea/
+*.iml
+*.iws
+>>>>>>> origin/master
