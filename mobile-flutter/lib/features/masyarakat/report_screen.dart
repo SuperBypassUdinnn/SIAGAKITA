@@ -26,12 +26,12 @@ class _ReportScreenState extends State<ReportScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Buat Laporan', style: TextStyle(color: colors.onBackground, fontWeight: FontWeight.bold)),
+        title: Text('Buat Laporan', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: colors.onBackground),
+        iconTheme: IconThemeData(color: colors.onSurface),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -102,7 +102,7 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 2. Kategori Darurat
-              Text('Kategori Darurat', style: TextStyle(color: colors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Kategori Darurat', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               SizedBox(
                 height: 100,
@@ -147,7 +147,7 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 3. Media
-              Text('Lampiran Foto & Audio', style: TextStyle(color: colors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Lampiran Foto & Audio', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -217,7 +217,7 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 5. Urgency
-              Text('Tingkat Urgensi', style: TextStyle(color: colors.onBackground, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Tingkat Urgensi', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               Row(
                 children: [

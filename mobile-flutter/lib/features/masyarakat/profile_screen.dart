@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import '../auth/login_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -10,14 +10,14 @@ class ProfileScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Profil Pengguna', style: TextStyle(color: colors.onBackground, fontSize: 24, fontWeight: FontWeight.bold)),
+              Text('Profil Pengguna', style: TextStyle(color: colors.onSurface, fontSize: 24, fontWeight: FontWeight.bold)),
               const SizedBox(height: 24),
               
               // User Card

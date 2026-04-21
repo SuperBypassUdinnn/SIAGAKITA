@@ -69,14 +69,14 @@ class _GuideScreenState extends State<GuideScreen> {
     ).toList();
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                border: Border(bottom: BorderSide(color: colors.onBackground.withValues(alpha: 0.1))),
+                border: Border(bottom: BorderSide(color: colors.onSurface.withValues(alpha: 0.1))),
               ),
               child: Column(
                 children: [
@@ -94,7 +94,7 @@ class _GuideScreenState extends State<GuideScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Panduan Darurat', style: TextStyle(color: colors.onBackground, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Panduan Darurat', style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
                           Row(
                             children: const [
