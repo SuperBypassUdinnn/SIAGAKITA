@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/login_screen.dart';
+import 'features/auth/login_screen.dart';
 
 void main() {
   runApp(const SiagaKitaApp());
@@ -29,7 +29,7 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
 
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: SiagaKitaApp.themeNotifier,
-      builder: (_, ThemeMode currentMode, __) {
+      builder: (_, ThemeMode currentMode, child) {
         return MaterialApp(
           title: 'SiagaKita',
           debugShowCheckedModeBanner: false,
@@ -42,9 +42,7 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
               primary: primaryColor,
               secondary: Color(0xFF18A3FF),
               surface: lightCardColor,
-              background: lightBgColor,
               onSurface: Color(0xFF1E293B),
-              onBackground: Color(0xFF1E293B),
             ),
             fontFamily: 'Inter',
             appBarTheme: const AppBarTheme(
@@ -68,9 +66,7 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
               primary: primaryColor,
               secondary: Color(0xFF18A3FF),
               surface: darkCardColor,
-              background: darkBgColor,
               onSurface: Colors.white,
-              onBackground: Colors.white,
             ),
             fontFamily: 'Inter',
             appBarTheme: const AppBarTheme(

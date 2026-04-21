@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../main.dart'; // To access SiagaKitaApp.themeNotifier
+import '../../main.dart'; // To access SiagaKitaApp.themeNotifier
 import 'report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: Stack(
           children: [
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           Text(
                             'Tekan dan tahan untuk bantuan',
                             style: TextStyle(
-                              color: colors.onBackground.withValues(alpha: 0.6),
+                              color: colors.onSurface.withValues(alpha: 0.6),
                               fontSize: 12,
                             ),
                           ),
@@ -126,7 +126,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           decoration: BoxDecoration(
                             color: colors.surface,
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                            boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
                           ),
                           child: Icon(
                             isDarkMode ? Icons.wb_sunny : Icons.nightlight_round,
@@ -236,7 +236,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             decoration: BoxDecoration(
                               color: colors.surface,
                               borderRadius: BorderRadius.circular(24),
-                              boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                              boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
                             ),
                             child: Column(
                               children: [
@@ -252,14 +252,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 const SizedBox(height: 12),
                                 Text('Laporkan',
                                     style: TextStyle(
-                                        color: colors.onBackground,
+                                        color: colors.onSurface,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14)),
                                 const SizedBox(height: 4),
                                 Text('Kirim bukti & titik\nlokasi',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
-                                        color: colors.onBackground.withValues(alpha: 0.5), fontSize: 10)),
+                                        color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10)),
                               ],
                             ),
                           ),
@@ -272,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           decoration: BoxDecoration(
                             color: colors.surface,
                             borderRadius: BorderRadius.circular(24),
-                            boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+                            boxShadow: isDarkMode ? [] : [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
                           ),
                           child: Column(
                             children: [
@@ -288,14 +288,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                               const SizedBox(height: 12),
                               Text('Edukasi',
                                   style: TextStyle(
-                                      color: colors.onBackground,
+                                      color: colors.onSurface,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14)),
                               const SizedBox(height: 4),
                               Text('Panduan\npenyelamatan',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
-                                      color: colors.onBackground.withValues(alpha: 0.5), fontSize: 10)),
+                                      color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10)),
                             ],
                           ),
                         ),
@@ -336,9 +336,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ],
                     ),
-                    child: Column(
+                    child: const Column(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Text(
                           'SINYAL SOS TERKIRIM!',
                           style: TextStyle(

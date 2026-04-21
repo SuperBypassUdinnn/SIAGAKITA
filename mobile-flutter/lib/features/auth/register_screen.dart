@@ -55,13 +55,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          color: colors.onBackground,
+          color: colors.onSurface,
           onPressed: _prevStep,
         ),
       ),
@@ -115,7 +115,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Sudah punya akun?', style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6))),
+                    Text('Sudah punya akun?', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
@@ -149,9 +149,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       key: const ValueKey('step0'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Buat Akun Baru', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Buat Akun Baru', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Mari bergabung ke dalam jejaring keselamatan kami.', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Mari bergabung ke dalam jejaring keselamatan kami.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         _buildTextField(_usernameController, 'Username', Icons.alternate_email, colors),
         _buildTextField(_nameKtpController, 'Nama Sesuai KTP', Icons.person_outline, colors),
@@ -171,9 +171,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.message_outlined, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Verifikasi Nomor', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Verifikasi Nomor', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Masukkan kode OTP yang kami kirimkan ke\n${_phoneController.text.isNotEmpty ? _phoneController.text : "nomor telepon Anda"}', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Masukkan kode OTP yang kami kirimkan ke\n${_phoneController.text.isNotEmpty ? _phoneController.text : "nomor telepon Anda"}', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         _buildTextField(_otpController, 'Kode OTP', Icons.password, colors, inputType: TextInputType.number),
         const SizedBox(height: 8),
@@ -194,9 +194,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.credit_card, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Foto KTP', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Foto KTP', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Mohon berikan foto KTP asli Anda untuk keperluan verifikasi keamanan.', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Mohon berikan foto KTP asli Anda untuk keperluan verifikasi keamanan.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         Container(
           height: 200,
@@ -225,9 +225,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.face, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Foto Wajah', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Foto Wajah', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Ambil foto wajah (selfie) untuk pencocokan biometrik.', textAlign: TextAlign.center, style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Ambil foto wajah (selfie) untuk pencocokan biometrik.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         Container(
           height: 200,

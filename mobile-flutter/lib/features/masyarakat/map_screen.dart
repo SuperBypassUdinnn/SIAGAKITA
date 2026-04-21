@@ -9,7 +9,7 @@ class MapScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
@@ -19,11 +19,11 @@ class MapScreen extends StatelessWidget {
               // Header
               const Text('JEJARING KESELAMATAN LOKAL', style: TextStyle(color: Color(0xFFFF7418), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 4),
-              Text('RADAR SIAGA & EVAKUASI', style: TextStyle(color: colors.onBackground, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('RADAR SIAGA & EVAKUASI', style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Text('Radius 5KM', style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
+                  Text('Radius 5KM', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -174,7 +174,7 @@ class MapScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
               // Status Transmisi
-              Text('STATUS TRANSMISI (SIMULASI SOS)', style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              Text('STATUS TRANSMISI (SIMULASI SOS)', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 12),
               
               _buildStatusCard('Koordinat GPS Terkunci (Akurasi 3m)', Colors.green, context, isDark),

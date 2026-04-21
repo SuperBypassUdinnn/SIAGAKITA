@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> {
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onBackground.withValues(alpha: 0.1), width: 1)),
+          border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 1)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,

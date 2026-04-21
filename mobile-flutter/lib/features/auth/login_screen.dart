@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
-import 'main_screen.dart';
+import '../masyarakat/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -26,7 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
-      backgroundColor: colors.background,
+      backgroundColor: colors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
@@ -58,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Selamat Datang',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: colors.onBackground,
+                  color: colors.onSurface,
                   fontSize: 28,
                   fontWeight: FontWeight.w900,
                 ),
@@ -68,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 'Masuk untuk mengakses sistem pelaporan darurat dan jejaring relawan.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: colors.onBackground.withValues(alpha: 0.6),
+                  color: colors.onSurface.withValues(alpha: 0.6),
                   fontSize: 14,
                 ),
               ),
@@ -142,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Belum punya akun?', style: TextStyle(color: colors.onBackground.withValues(alpha: 0.6))),
+                  Text('Belum punya akun?', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).push(
