@@ -38,7 +38,7 @@ lib/
 │   │   └── report_screen.dart        — Form pelaporan kejadian darurat
 │   │
 │   ├── relawan/
-│   │   └── relawan_main_screen.dart  — [PLACEHOLDER] Tab: Tugas, Peta, Koordinasi, Profil
+│   │   └── relawan_main_screen.dart  — Tactical Dashboard (On Duty Toggle, Radar Misi, Poin/Level)
 │   │
 │   ├── instansi/
 │   │   └── instansi_main_screen.dart — [PLACEHOLDER] Tab: Dashboard, Laporan, Tim, Profil
@@ -102,7 +102,7 @@ untuk menavigasi ke halaman yang sesuai.
        ▼
   [Berdasarkan role dari API]
        ├── masyarakat → MainScreen (Beranda/Panduan/Map/Profil)
-       ├── relawan    → RelawanMainScreen  [PLACEHOLDER]
+       ├── relawan    → MainScreen (Inject Extra Tab "Operasi" → RelawanMainScreen)
        ├── instansi   → InstansiMainScreen [PLACEHOLDER]
        └── admin      → AdminMainScreen    [PLACEHOLDER]
 
@@ -132,10 +132,14 @@ untuk menavigasi ke halaman yang sesuai.
           "id":    "string",
           "name":  "string",
           "email": "string",
-          "role":  "masyarakat" | "relawan" | "instansi" | "admin"
+          "role":  "masyarakat" | "relawan" | "instansi" | "admin",
+          "volunteer_status": "none" | "pending" | "approved"
         }
       }
     Response gagal: { "message": "Email atau password salah" }
+
+  *NOTE DEV: Saat ini terdapat "Mock Role Selector" (Dropdown) di 
+  LoginScreen untuk testing loncat antar role UI tanpa backend riil.
 
 ─────────────────────────────────────────────────────────────
 4.2 REGISTER SCREEN (features/auth/register_screen.dart)
@@ -368,6 +372,35 @@ untuk menavigasi ke halaman yang sesuai.
       }
     ]
 
+─────────────────────────────────────────────────────────────
+4.9 RELAWAN TACTICAL SCREEN (features/relawan/relawan_main_screen.dart)
+─────────────────────────────────────────────────────────────
+  Tampil sebagai tab ekstra "Operasi" pada bottom navigation bar
+  jika user (role = relawan atau volunteer_status = "approved").
+  Didesain dengan *Tactical Mode* & *High Contrast*.
+
+  Fitur & Data yang ditampilkan:
+    - Status ketersediaan relawan (Toggle On/Off Duty)
+    - Poin & Level Gamifikasi
+    - Spesialisasi Relawan
+    - Panggilan Misi (Radar Darurat Aktif)
+
+  API yang DIBUTUHKAN:
+    GET /api/volunteer/dashboard
+    Headers: Authorization: Bearer <token>
+    Response: {
+      "is_available_for_mission": true,
+      "specialization": "Medis & First Aid",
+      "volunteer_points": 120,
+      "volunteer_level": "Relawan Madya",
+      "active_mission": {
+         "id": "1",
+         "description": "Kecelakaan lalu lintas...",
+         "distance_km": 1.2
+      }
+    }
+
+
 ===========================================================================
 5. RINGKASAN ENDPOINT API YANG DIBUTUHKAN
 ===========================================================================
@@ -422,9 +455,13 @@ untuk menavigasi ke halaman yang sesuai.
   5. STATUS LAPORAN yang diharapkan frontend (untuk update UI nanti):
      "pending" | "diproses" | "selesai" | "ditolak"
 
-  6. SCREEN RELAWAN, INSTANSI, dan ADMIN saat ini masih PLACEHOLDER.
-     API untuk 3 role ini belum dirancang dari sisi frontend.
-     Akan dikembangkan menyusul setelah auth & masyarakat selesai.
+  6. MODEL RELAWAN TERBARU menambah kolom extra untuk routing dinamic:
+     - "volunteer_status" (string) -> menentukan tab Operasi disematkan.
+     - "is_available_for_mission" (bool) -> switch duty di dasbor relawan.
+     - "specialization" (string) -> didapat dari pendaftaran.
+     
+  7. SCREEN INSTANSI, dan ADMIN saat ini masih PLACEHOLDER.
+     Akan dikembangkan menyusul setelah relawan disempurnakan.
 
 ===========================================================================
   Dibuat oleh: Tim Frontend SiagaKita
