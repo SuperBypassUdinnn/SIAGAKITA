@@ -154,8 +154,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             child: CircularProgressIndicator(
                               value: _progress,
                               strokeWidth: 8,
-                              backgroundColor: Colors.transparent,
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                              backgroundColor: isDarkMode 
+                                  ? Colors.white.withValues(alpha: 0.1) 
+                                  : primaryColor.withValues(alpha: 0.15),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                isDarkMode ? Colors.white : Colors.orangeAccent,
+                              ),
                             ),
                           ),
                         GestureDetector(
@@ -176,14 +180,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                 border: Border.all(
                                   color: _isHolding
                                       ? const Color(0xFFFFA265)
-                                      : (isDarkMode ? Colors.white.withValues(alpha: 0.2) : Colors.black.withValues(alpha: 0.1)),
+                                      : (isDarkMode ? Colors.white.withValues(alpha: 0.2) : primaryColor.withValues(alpha: 0.3)),
                                   width: 8,
                                 ),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: primaryColor.withValues(alpha: _isHolding ? 0.6 : 0.3),
+                                    color: primaryColor.withValues(alpha: _isHolding ? 0.8 : (isDarkMode ? 0.3 : 0.6)),
                                     blurRadius: _isHolding ? 50 : 30,
-                                    spreadRadius: _isHolding ? 10 : 5,
+                                    spreadRadius: _isHolding ? 10 : (isDarkMode ? 5 : 10),
                                   ),
                                 ],
                               ),
@@ -203,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                   Text(
                                     'TAHAN 10 DETIK',
                                     style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.8),
+                                      color: Colors.white.withValues(alpha: 0.9),
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 2,
