@@ -12,6 +12,7 @@ class VolunteerRegistrationScreen extends StatefulWidget {
 class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScreen> {
   final _expCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String? _selectedSpecialization;
   
   bool _hasMockKtp = false;
   bool _hasMockSertifikat = false;
@@ -40,7 +41,10 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
     // Simulate API Call to Laravel Backend
     Timer(const Duration(seconds: 2), () {
       final user = UserModel.currentUser.value;
-      UserModel.currentUser.value = user.copyWith(volunteerStatus: 'pending');
+      UserModel.currentUser.value = user.copyWith(
+        volunteerStatus: 'pending',
+        specialization: _selectedSpecialization,
+      );
       
       if (mounted) {
         setState(() => _isLoading = false);
@@ -131,6 +135,25 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
                 'SiagaKita memanggil Anda yang memiliki kapabilitas medis / evakuasi gawat darurat. Pengajuan akan ditinjau oleh Admin daerah.',
                 style: TextStyle(color: isDark ? Colors.white70 : colors.onSurface.withValues(alpha: 0.6), height: 1.5),
               ),
+              const SizedBox(height: 32),
+              
+              Text('PILIHAN SPESIALISASI', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: _selectedSpecialization,
+                decoration: InputDecoration(
+                  labelText: 'Keahlian Relawan',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                items: ['Medis & First Aid', 'Evakuasi & SAR', 'Logistik & Dapur Umum', 'Komunikasi & Operator']
+                    .map((val) => DropdownMenuItem(value: val, child: Text(val)))
+                    .toList(),
+                onChanged: (val) {
+                  setState(() => _selectedSpecialization = val);
+                },
+                validator: (v) => v == null ? 'Wajib memilih spesialisasi' : null,
+              ),
+
               const SizedBox(height: 32),
               
               Text('PENGALAMAN MEDIS / ORGANISASI', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),

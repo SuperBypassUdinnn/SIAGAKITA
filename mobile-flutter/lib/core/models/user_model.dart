@@ -19,6 +19,10 @@ class UserModel {
   final String? phoneNumber;
   final String? bio;
   final String? volunteerStatus; // 'none', 'pending', 'approved'
+  final String? specialization; 
+  final int volunteerPoints;
+  final String volunteerLevel;
+  final bool isAvailableForMission;
   final Map<String, dynamic>? medicalData;
   final List<Map<String, dynamic>>? emergencyContacts;
 
@@ -30,6 +34,10 @@ class UserModel {
     this.phoneNumber,
     this.bio,
     this.volunteerStatus,
+    this.specialization,
+    this.volunteerPoints = 0,
+    this.volunteerLevel = 'Pemula',
+    this.isAvailableForMission = false,
     this.medicalData,
     this.emergencyContacts,
   });
@@ -43,7 +51,11 @@ class UserModel {
       role: UserRole.masyarakat,
       phoneNumber: '081234567890',
       bio: 'Pemerhati keamanan bencana dan warga aktif dalam sosialisasi tanggap darurat lingkungan.',
-      volunteerStatus: 'none',
+      volunteerStatus: 'approved',
+      specialization: 'Medis Pertama',
+      volunteerPoints: 120,
+      volunteerLevel: 'Relawan Madya',
+      isAvailableForMission: true,
       medicalData: {
         'blood_type': 'O+',
         'weight_height': '70kg / 175cm',
@@ -69,6 +81,10 @@ class UserModel {
     String? phoneNumber,
     String? bio,
     String? volunteerStatus,
+    String? specialization,
+    int? volunteerPoints,
+    String? volunteerLevel,
+    bool? isAvailableForMission,
     Map<String, dynamic>? medicalData,
     List<Map<String, dynamic>>? emergencyContacts,
   }) {
@@ -80,6 +96,10 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       bio: bio ?? this.bio,
       volunteerStatus: volunteerStatus ?? this.volunteerStatus,
+      specialization: specialization ?? this.specialization,
+      volunteerPoints: volunteerPoints ?? this.volunteerPoints,
+      volunteerLevel: volunteerLevel ?? this.volunteerLevel,
+      isAvailableForMission: isAvailableForMission ?? this.isAvailableForMission,
       medicalData: medicalData ?? this.medicalData,
       emergencyContacts: emergencyContacts ?? this.emergencyContacts,
     );
@@ -126,6 +146,10 @@ class UserModel {
       phoneNumber: json['phone_number'],
       bio: json['bio'],
       volunteerStatus: json['volunteer_status'],
+      specialization: json['specialization'],
+      volunteerPoints: json['volunteer_points'] ?? 0,
+      volunteerLevel: json['volunteer_level'] ?? 'Pemula',
+      isAvailableForMission: json['is_available_for_mission'] ?? false,
       medicalData: json['medical_data'] != null ? Map<String, dynamic>.from(json['medical_data']) : null,
       emergencyContacts: json['emergency_contacts'] != null
           ? List<Map<String, dynamic>>.from(json['emergency_contacts'])
@@ -143,6 +167,10 @@ class UserModel {
       'phone_number': phoneNumber,
       'bio': bio,
       'volunteer_status': volunteerStatus,
+      'specialization': specialization,
+      'volunteer_points': volunteerPoints,
+      'volunteer_level': volunteerLevel,
+      'is_available_for_mission': isAvailableForMission,
       'medical_data': medicalData,
       'emergency_contacts': emergencyContacts,
     };

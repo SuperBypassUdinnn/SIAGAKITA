@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'register_screen.dart';
 import '../masyarakat/main_screen.dart';
-
+import '../relawan/relawan_main_screen.dart';
+import '../../core/models/user_model.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,9 +13,36 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  
+  String _selectedMockRole = 'Masyarakat Umum';
 
   void _login() {
-    // Simulasi Login -> Ke Main UI
+    UserRole newRole = UserRole.masyarakat;
+    String volStatus = 'none';
+
+    if (_selectedMockRole == 'Relawan (Terverifikasi)') {
+      newRole = UserRole.relawan;
+      volStatus = 'approved';
+    } else if (_selectedMockRole == 'Instansi Penyelamat') {
+      newRole = UserRole.instansi;
+    } else if (_selectedMockRole == 'Admin Sistem') {
+      newRole = UserRole.admin;
+    }
+    
+    final user = UserModel.currentUser.value;
+    UserModel.currentUser.value = user.copyWith(
+      role: newRole,
+      volunteerStatus: volStatus,
+      isAvailableForMission: newRole == UserRole.relawan ? true : false,
+    );
+
+    if (newRole == UserRole.instansi || newRole == UserRole.admin) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Dasbor $_selectedMockRole sedang dalam pengembangan')),
+      );
+      return;
+    }
+    
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (_) => const MainScreen()),
     );
@@ -112,6 +140,31 @@ class _LoginScreenState extends State<LoginScreen> {
                     prefixIcon: Icon(Icons.lock_outline, color: colors.onSurface.withValues(alpha: 0.5)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 16),
+              
+              // Mock Role Selector (Dev mode)
+              Container(
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedMockRole,
+                    isExpanded: true,
+                    icon: Icon(Icons.developer_mode, color: primaryColor),
+                    items: ['Masyarakat Umum', 'Relawan (Terverifikasi)', 'Instansi Penyelamat', 'Admin Sistem']
+                        .map((role) => DropdownMenuItem(value: role, child: Text('Login sebagai: $role', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14))))
+                        .toList(),
+                    onChanged: (val) {
+                      setState(() => _selectedMockRole = val!);
+                    },
                   ),
                 ),
               ),
