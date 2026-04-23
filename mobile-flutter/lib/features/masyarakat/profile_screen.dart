@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
 import '../../core/models/user_model.dart';
 import 'edit_profile_screen.dart';
+import 'settings_screen.dart';
+import 'about_screen.dart';
 import 'volunteer_registration_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -261,9 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: Text('Pengaturan', style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
                         trailing: Icon(Icons.chevron_right, color: hintColor),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Menu Pengaturan Segera Hadir.')),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
                         },
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
@@ -272,9 +272,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: Text('Tentang Aplikasi', style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
                         trailing: Icon(Icons.chevron_right, color: hintColor),
                         onTap: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Tentang SiagaKita v1.0.0 Segera Hadir.')),
-                          );
+                          Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
                         },
                       ),
                     ],
