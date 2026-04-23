@@ -1,7 +1,7 @@
 ===========================================================================
   SIAGAKITA — DOKUMENTASI STRUKTUR FRONTEND (Flutter)
   Untuk referensi tim Backend
-  Dibuat: 22 April 2026
+  Diperbarui: 24 April 2026
 ===========================================================================
 
 CATATAN PENTING:
@@ -35,6 +35,9 @@ lib/
 │   │   ├── guide_screen.dart         — Panduan Pertolongan Pertama (lokal/offline)
 │   │   ├── map_screen.dart           — Radar & peta sebaran relawan + titik kumpul
 │   │   ├── profile_screen.dart       — Profil pengguna + data kesehatan (biometric ledger)
+│   │   ├── edit_profile_screen.dart  — Form penyuntingan biodata & profil
+│   │   ├── settings_screen.dart      — Pengaturan notifikasi, privasi, & mode gelap
+│   │   ├── about_screen.dart         — Informasi versi aplikasi & lisensi
 │   │   └── report_screen.dart        — Form pelaporan kejadian darurat
 │   │
 │   ├── relawan/
@@ -64,10 +67,13 @@ Terdapat 4 role yang didefinisikan di core/models/user_model.dart:
 
 Model UserModel yang diharapkan dari response API login:
   {
-    "id":    "string",    — ID unik pengguna
-    "name":  "string",    — Nama lengkap
-    "email": "string",    — Email
-    "role":  "string"     — Salah satu: "masyarakat" | "relawan" | "instansi" | "admin"
+    "id":           "string",    — ID unik pengguna
+    "name":         "string",    — Nama lengkap
+    "email":        "string",    — Email
+    "role":         "string",    — Salah satu: "masyarakat" | "relawan" | "instansi" | "admin"
+    "phone_number": "string",    — Nomor telepon utama
+    "birth_date":   "string",    — Tanggal lahir (DD-MM-YYYY)
+    "bio":          "string"     — Bio singkat pengguna
   }
 
 Setelah login, frontend akan memanggil AppRouter.getHomeByRole(role)
@@ -191,9 +197,10 @@ untuk menavigasi ke halaman yang sesuai.
   penanganan medis darurat.
 
   Field yang dikumpulkan:
-    - blood_type              : String (mis. "O+", "AB-")
-    - weight_kg               : Number (Berat badan, kg)
-    - height_cm               : Number (Tinggi badan, cm)
+    - birth_date              : String (Format: DD-MM-YYYY)
+    - blood_type              : String (Dropdown: "A+", "B-", dll)
+    - weight                  : String/Num (Berat badan, kg)
+    - height                  : String/Num (Tinggi badan, cm)
     - medical_history         : String (riwayat penyakit)
     - allergies               : String (daftar alergi)
     - address                 : String (alamat domisili lengkap)
@@ -204,9 +211,10 @@ untuk menavigasi ke halaman yang sesuai.
     POST /api/user/biodata
     Headers: Authorization: Bearer <token>
     Body: {
+      "birth_date": "20-05-1998",
       "blood_type": "O+",
-      "weight_kg": 70,
-      "height_cm": 175,
+      "weight": "70",
+      "height": "175",
       "medical_history": "Asma Ringan",
       "allergies": "Penisilin, Kacang",
       "address": "Jl. ...",
@@ -312,12 +320,16 @@ untuk menavigasi ke halaman yang sesuai.
 ─────────────────────────────────────────────────────────────
   Menampilkan data profil pengguna. Saat ini data masih STATIS.
 
-  Data yang ditampilkan:
-    - Nama, ID SiagaKita
-    - Golongan darah, berat, tinggi
-    - Alergi, riwayat medis
-    - Alamat lengkap
-    - Kontak darurat (nama + nomor telepon)
+  Data yang ditampilkan (Dinamis):
+    - Nama Lengkap + Kalkulasi Umur (Otomatis dari birth_date)
+    - ID SiagaKita
+    - Status Relawan (Badge)
+    - Email, Nomor Telepon, Bio
+    - Tanggal Lahir (DD-MM-YYYY)
+    - Golongan Darah, Berat & Tinggi
+    - Alergi, Riwayat Medis
+    - Alamat Lengkap
+    - Kontak Darurat (Nama + Nomor Telepon)
 
   API yang DIBUTUHKAN:
     GET /api/user/profile
@@ -326,15 +338,26 @@ untuk menavigasi ke halaman yang sesuai.
       "id":                     "SK-2983-4412",
       "name":                   "Budi Santoso",
       "email":                  "budi@email.com",
+      "phone_number":           "0812-3456-7890",
+      "birth_date":             "20-05-1998",
+      "bio":                    "Pemerhati keamanan bencana...",
       "role":                   "masyarakat",
-      "blood_type":             "O+",
-      "weight_kg":              70,
-      "height_cm":              175,
-      "allergies":              "Penisilin, Kacang",
-      "medical_history":        "Asma Ringan",
-      "address":                "Jl. Cut Nyak Dhien No. 44, ...",
-      "emergency_contact_name": "Siti Aminah",
-      "emergency_contact_phone":"0812-3456-7890"
+      "volunteer_status":       "approved",
+      "medical_data": {
+        "blood_type":           "O+",
+        "weight":               "70",
+        "height":               "175",
+        "allergies":            "Penisilin, Kacang",
+        "medical_history":      "Asma Ringan",
+        "address":              "Jl. Cut Nyak Dhien No. 44, ..."
+      },
+      "emergency_contacts": [
+        {
+          "name":  "Siti Aminah",
+          "phone": "0812-3456-7891",
+          "relation": "Ibu / Wali"
+        }
+      ]
     }
 
   Tombol "Keluar dari Akun":
@@ -399,6 +422,29 @@ untuk menavigasi ke halaman yang sesuai.
          "distance_km": 1.2
       }
     }
+
+─────────────────────────────────────────────────────────────
+4.10 SETTINGS SCREEN (features/masyarakat/settings_screen.dart)
+─────────────────────────────────────────────────────────────
+  Konfigurasi preferensi pengguna secara lokal & server.
+  
+  Fitur:
+    - Toggle Notifikasi Push & SMS
+    - Akses Lokasi (Background Permission)
+    - Tema (Light/Dark Mode)
+    - Bahasa (Indonesia/English)
+    - Ganti Password & Hapus Akun
+
+─────────────────────────────────────────────────────────────
+4.11 ABOUT SCREEN (features/masyarakat/about_screen.dart)
+─────────────────────────────────────────────────────────────
+  Halaman statis informasi aplikasi.
+  
+  Konten:
+    - Logo SIAGAKITA & Versi Build
+    - Deskripsi Misi Aplikasi
+    - Tautan Syarat & Ketentuan (TOS)
+    - Tautan Kebijakan Privasi
 
 
 ===========================================================================
