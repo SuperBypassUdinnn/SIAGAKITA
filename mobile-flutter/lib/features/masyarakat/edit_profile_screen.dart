@@ -11,11 +11,14 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   // Informasi Pribadi
   final _phoneCtrl = TextEditingController();
+  final _birthDateCtrl = TextEditingController();
   final _bioCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
 
   // Data Medis
   final _bloodTypeCtrl = TextEditingController();
+  final _weightCtrl = TextEditingController();
+  final _heightCtrl = TextEditingController();
   final _allergiesCtrl = TextEditingController();
   final _medicalHistoryCtrl = TextEditingController();
   
@@ -28,11 +31,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final user = UserModel.currentUser.value;
     
     _phoneCtrl.text = user.phoneNumber ?? '';
+    _birthDateCtrl.text = user.birthDate ?? '';
     _bioCtrl.text = user.bio ?? '';
     
     final medData = user.medicalData ?? {};
     _addressCtrl.text = medData['address'] ?? '';
     _bloodTypeCtrl.text = medData['blood_type'] ?? '';
+    _weightCtrl.text = medData['weight']?.toString() ?? '';
+    _heightCtrl.text = medData['height']?.toString() ?? '';
     _allergiesCtrl.text = medData['allergies'] ?? '';
     _medicalHistoryCtrl.text = medData['medical_history'] ?? '';
     
@@ -47,9 +53,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _phoneCtrl.dispose();
+    _birthDateCtrl.dispose();
     _bioCtrl.dispose();
     _addressCtrl.dispose();
     _bloodTypeCtrl.dispose();
+    _weightCtrl.dispose();
+    _heightCtrl.dispose();
     _allergiesCtrl.dispose();
     _medicalHistoryCtrl.dispose();
     super.dispose();
@@ -65,6 +74,44 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() {
       _contacts.removeAt(index);
     });
+  }
+
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime initialDate = DateTime(2000, 1, 1);
+    if (_birthDateCtrl.text.isNotEmpty) {
+      try {
+        final parts = _birthDateCtrl.text.split('-');
+        if (parts.length == 3) {
+          if (parts[0].length == 4) {
+            initialDate = DateTime.parse(_birthDateCtrl.text);
+          } else {
+            initialDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+          }
+        }
+      } catch (e) {}
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).brightness == Brightness.dark 
+              ? const ColorScheme.dark(primary: Colors.orange, onPrimary: Colors.white, surface: Color(0xFF162A5A), onSurface: Colors.white)
+              : const ColorScheme.light(primary: Colors.orange, onPrimary: Colors.white, surface: Colors.white, onSurface: Colors.black),
+          ),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      setState(() {
+        _birthDateCtrl.text = "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
+      });
+    }
   }
 
   void _saveData() {
@@ -98,11 +145,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final updatedMedData = Map<String, dynamic>.from(user.medicalData ?? {});
     updatedMedData['address'] = _addressCtrl.text;
     updatedMedData['blood_type'] = _bloodTypeCtrl.text;
+    updatedMedData['weight'] = _weightCtrl.text;
+    updatedMedData['height'] = _heightCtrl.text;
     updatedMedData['allergies'] = _allergiesCtrl.text;
     updatedMedData['medical_history'] = _medicalHistoryCtrl.text;
     
     UserModel.currentUser.value = user.copyWith(
       phoneNumber: _phoneCtrl.text,
+      birthDate: _birthDateCtrl.text.isEmpty ? null : _birthDateCtrl.text,
       bio: _bioCtrl.text,
       medicalData: updatedMedData,
       emergencyContacts: _contacts.isEmpty ? null : _contacts,
@@ -161,6 +211,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     ),
                     const SizedBox(height: 16),
                     TextField(
+                      controller: _birthDateCtrl,
+                      readOnly: true,
+                      onTap: () => _selectDate(context),
+                      decoration: InputDecoration(
+                        labelText: 'Tanggal Lahir (DD-MM-YYYY)', 
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        suffixIcon: const Icon(Icons.calendar_today, size: 18),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
                       controller: _addressCtrl,
                       maxLines: 2,
                       decoration: InputDecoration(
@@ -212,6 +273,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       onChanged: (val) {
                         if (val != null) _bloodTypeCtrl.text = val;
                       },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _weightCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Berat (kg)', 
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: _heightCtrl,
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              labelText: 'Tinggi (cm)', 
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextField(

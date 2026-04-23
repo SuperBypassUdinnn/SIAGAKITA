@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(user.name, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryTextColor)),
+                          Text(user.name + (user.age != null ? ' (${user.age} Tahun)' : ''), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryTextColor)),
                           const SizedBox(height: 2),
                           Text('ID/NIM: ${user.id}', style: TextStyle(fontSize: 12, color: hintColor, fontFamily: 'monospace')),
                           _buildVolunteerBadge(user),
@@ -131,6 +131,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: Icon(Icons.phone, color: primaryTextColor),
                         title: Text('Nomor Telepon', style: TextStyle(fontSize: 12, color: hintColor)),
                         subtitle: Text(user.phoneNumber ?? '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
+                      ),
+                      Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
+                      ListTile(
+                        leading: Icon(Icons.cake, color: primaryTextColor),
+                        title: Text('Tanggal Lahir / Umur', style: TextStyle(fontSize: 12, color: hintColor)),
+                        subtitle: Text(user.birthDate != null ? '${user.birthDate} (${user.age} Tahun)' : '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
@@ -169,6 +175,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         leading: const Icon(Icons.bloodtype, color: Colors.red),
                         title: Text('Golongan Darah', style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
                         subtitle: Text(medData['blood_type'] ?? '-', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
+                      ),
+                      Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFFCDD2)),
+                      ListTile(
+                        leading: const Icon(Icons.monitor_weight_outlined, color: Colors.blue),
+                        title: Text('Berat & Tinggi', style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade300 : Colors.blueAccent)),
+                        subtitle: Text('${medData['weight'] ?? '-'} kg / ${medData['height'] ?? '-'} cm', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFFCDD2)),
                       ListTile(

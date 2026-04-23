@@ -17,6 +17,7 @@ class UserModel {
   
   // New properties for profile & volunteer features
   final String? phoneNumber;
+  final String? birthDate; // format: DD-MM-YYYY or YYYY-MM-DD
   final String? bio;
   final String? volunteerStatus; // 'none', 'pending', 'approved'
   final String? specialization; 
@@ -32,6 +33,7 @@ class UserModel {
     required this.email,
     required this.role,
     this.phoneNumber,
+    this.birthDate,
     this.bio,
     this.volunteerStatus,
     this.specialization,
@@ -50,6 +52,7 @@ class UserModel {
       email: 'budi@email.com',
       role: UserRole.masyarakat,
       phoneNumber: '081234567890',
+      birthDate: '20-05-1998',
       bio: 'Pemerhati keamanan bencana dan warga aktif dalam sosialisasi tanggap darurat lingkungan.',
       volunteerStatus: 'approved',
       specialization: 'Medis Pertama',
@@ -58,7 +61,8 @@ class UserModel {
       isAvailableForMission: true,
       medicalData: {
         'blood_type': 'O+',
-        'weight_height': '70kg / 175cm',
+        'weight': '70',
+        'height': '175',
         'allergies': 'Penisilin, Kacang',
         'medical_history': 'Asma Ringan',
         'address': 'Jl. Cut Nyak Dhien No. 44, Peukan Bada, Kabupaten Aceh Besar, Aceh 23351',
@@ -79,6 +83,7 @@ class UserModel {
     String? email,
     UserRole? role,
     String? phoneNumber,
+    String? birthDate,
     String? bio,
     String? volunteerStatus,
     String? specialization,
@@ -94,6 +99,7 @@ class UserModel {
       email: email ?? this.email,
       role: role ?? this.role,
       phoneNumber: phoneNumber ?? this.phoneNumber,
+      birthDate: birthDate ?? this.birthDate,
       bio: bio ?? this.bio,
       volunteerStatus: volunteerStatus ?? this.volunteerStatus,
       specialization: specialization ?? this.specialization,
@@ -103,6 +109,33 @@ class UserModel {
       medicalData: medicalData ?? this.medicalData,
       emergencyContacts: emergencyContacts ?? this.emergencyContacts,
     );
+  }
+
+  /// Menghitung umur berdasarkan birthDate (bisa YYYY-MM-DD atau DD-MM-YYYY)
+  int? get age {
+    if (birthDate == null || birthDate!.isEmpty) return null;
+    try {
+      DateTime birth;
+      final parts = birthDate!.split('-');
+      if (parts.length == 3) {
+        if (parts[0].length == 4) {
+          birth = DateTime.parse(birthDate!);
+        } else {
+          birth = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
+        }
+      } else {
+        birth = DateTime.parse(birthDate!);
+      }
+      
+      final today = DateTime.now();
+      int calculatedAge = today.year - birth.year;
+      if (today.month < birth.month || (today.month == birth.month && today.day < birth.day)) {
+        calculatedAge--;
+      }
+      return calculatedAge;
+    } catch (e) {
+      return null;
+    }
   }
 
   /// Label role dalam Bahasa Indonesia
@@ -144,6 +177,7 @@ class UserModel {
         orElse: () => UserRole.masyarakat,
       ),
       phoneNumber: json['phone_number'],
+      birthDate: json['birth_date'],
       bio: json['bio'],
       volunteerStatus: json['volunteer_status'],
       specialization: json['specialization'],
@@ -165,6 +199,7 @@ class UserModel {
       'email': email,
       'role': role.name,
       'phone_number': phoneNumber,
+      'birth_date': birthDate,
       'bio': bio,
       'volunteer_status': volunteerStatus,
       'specialization': specialization,
