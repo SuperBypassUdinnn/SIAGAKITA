@@ -1,7 +1,7 @@
 ===========================================================================
   SIAGAKITA — DOKUMENTASI STRUKTUR FRONTEND (Flutter)
   Untuk referensi tim Backend
-  Diperbarui: 24 April 2026
+  Diperbarui: 25 April 2026
 ===========================================================================
 
 CATATAN PENTING:
@@ -14,11 +14,13 @@ CATATAN PENTING:
 ===========================================================================
 
 lib/
-├── main.dart                         — Entry point, konfigurasi tema (Dark/Light)
+├── main.dart                         — Entry point, konfigurasi tema + locale global (ID/EN)
 │
 ├── core/
 │   ├── models/
 │   │   └── user_model.dart           — Model UserModel + Enum UserRole
+│   ├── localization/
+│   │   └── app_localization.dart     — Kamus terjemahan ID→EN + extension .tr(context)
 │   ├── widgets/
 │   │   └── role_placeholder.dart     — Widget placeholder shared (relawan, instansi, admin)
 │   └── router.dart                   — AppRouter: routing berdasarkan role setelah login
@@ -36,7 +38,7 @@ lib/
 │   │   ├── map_screen.dart           — Radar & peta sebaran relawan + titik kumpul
 │   │   ├── profile_screen.dart       — Profil pengguna + data kesehatan (biometric ledger)
 │   │   ├── edit_profile_screen.dart  — Form penyuntingan biodata & profil
-│   │   ├── settings_screen.dart      — Pengaturan notifikasi, privasi, & mode gelap
+│   │   ├── settings_screen.dart      — Pengaturan notifikasi, privasi, mode gelap, & bahasa
 │   │   ├── about_screen.dart         — Informasi versi aplikasi & lisensi
 │   │   └── report_screen.dart        — Form pelaporan kejadian darurat
 │   │
@@ -435,6 +437,17 @@ untuk menavigasi ke halaman yang sesuai.
     - Bahasa (Indonesia/English)
     - Ganti Password & Hapus Akun
 
+  Catatan implementasi terbaru:
+    - Pemilihan bahasa di Settings memicu perubahan locale global aplikasi.
+    - Locale dikelola melalui ValueNotifier di main.dart:
+        SiagaKitaApp.localeNotifier
+    - Bahasa yang tersedia:
+        "id" (Bahasa Indonesia) dan "en" (English)
+    - Teks lintas modul kini memakai translasi lokal melalui:
+        'teks'.tr(context)
+    - Karena translasi saat ini masih berbasis kamus frontend,
+      backend belum wajib menyediakan endpoint khusus bahasa.
+
 ─────────────────────────────────────────────────────────────
 4.11 ABOUT SCREEN (features/masyarakat/about_screen.dart)
 ─────────────────────────────────────────────────────────────
@@ -508,6 +521,11 @@ untuk menavigasi ke halaman yang sesuai.
      
   7. SCREEN INSTANSI, dan ADMIN saat ini masih PLACEHOLDER.
      Akan dikembangkan menyusul setelah relawan disempurnakan.
+
+  8. LOKALISASI (ID/EN) saat ini dikelola frontend-side.
+     Jika backend nanti ingin sinkron preferensi bahasa per user,
+     bisa ditambahkan field opsional "preferred_language":
+     "id" | "en" pada profil pengguna.
 
 ===========================================================================
   Dibuat oleh: Tim Frontend SiagaKita
