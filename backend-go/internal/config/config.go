@@ -1,0 +1,70 @@
+package config
+
+import (
+	"os"
+	"time"
+)
+
+// Config holds all application configuration loaded from environment variables.
+type Config struct {
+	// PostgreSQL
+	DBHost     string
+	DBPort     string
+	DBUser     string
+	DBPassword string
+	DBName     string
+
+	// Redis
+	RedisHost     string
+	RedisPort     string
+	RedisPassword string
+
+	// JWT
+	JWTSecret     string
+	JWTAccessTTL  time.Duration
+	JWTRefreshTTL time.Duration
+
+	// SMS Gateway
+	SMSGatewaySecret string
+
+	// Server
+	HTTPPort string
+	WSPort   string
+}
+
+// Load reads environment variables and returns a populated Config.
+func Load() *Config {
+	accessTTL, err := time.ParseDuration(getEnv("JWT_ACCESS_TTL", "15m"))
+	if err != nil {
+		accessTTL = 15 * time.Minute
+	}
+
+	refreshTTL, err := time.ParseDuration(getEnv("JWT_REFRESH_TTL", "168h"))
+	if err != nil {
+		refreshTTL = 168 * time.Hour
+	}
+
+	return &Config{
+		DBHost:           getEnv("DB_HOST", "localhost"),
+		DBPort:           getEnv("DB_PORT", "5432"),
+		DBUser:           getEnv("DB_USER", ""),
+		DBPassword:       getEnv("DB_PASSWORD", ""),
+		DBName:           getEnv("DB_NAME", ""),
+		RedisHost:        getEnv("REDIS_HOST", "localhost"),
+		RedisPort:        getEnv("REDIS_PORT", "6379"),
+		RedisPassword:    getEnv("REDIS_PASSWORD", ""),
+		JWTSecret:        getEnv("JWT_SECRET", ""),
+		JWTAccessTTL:     accessTTL,
+		JWTRefreshTTL:    refreshTTL,
+		SMSGatewaySecret: getEnv("SMS_GATEWAY_SECRET", ""),
+		HTTPPort:         getEnv("HTTP_PORT", "8080"),
+		WSPort:           getEnv("WS_PORT", "8081"),
+	}
+}
+
+func getEnv(key, fallback string) string {
+	if v := os.Getenv(key); v != "" {
+		return v
+	}
+	return fallback
+}
