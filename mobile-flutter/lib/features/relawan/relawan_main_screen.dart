@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import '../../core/models/user_model.dart';
 import '../auth/login_screen.dart';
 
@@ -43,7 +44,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Menu $title Segera Hadir')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${'Menu'.tr(context)} $title ${'Segera Hadir'.tr(context)}')));
       },
       child: Container(
         decoration: BoxDecoration(
@@ -100,7 +101,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             color: Colors.red,
-            tooltip: 'Keluar',
+            tooltip: 'Keluar'.tr(context),
             onPressed: () {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (_) => const LoginScreen()),
@@ -125,7 +126,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Komando Operasi', style: TextStyle(fontSize: 12, color: Colors.grey.shade500, letterSpacing: 1)),
+                        Text('Komando Operasi'.tr(context), style: TextStyle(fontSize: 12, color: Colors.grey.shade500, letterSpacing: 1)),
                         const SizedBox(height: 2),
                         Text('Halo, ${user.name.split(" ")[0]}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: primaryTextColor)),
                         const SizedBox(height: 6),
@@ -165,7 +166,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            user.isAvailableForMission ? 'ON DUTY (Siap Tugas)' : 'OFF DUTY (Istirahat)',
+                            user.isAvailableForMission ? 'ON DUTY (Siap Tugas)'.tr(context) : 'OFF DUTY (Istirahat)'.tr(context),
                             style: TextStyle(
                               color: user.isAvailableForMission ? Colors.green : Colors.red,
                               fontWeight: FontWeight.w900,
@@ -189,16 +190,16 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                 // 3. STATISTIK
                 Row(
                   children: [
-                    _buildStatCard('Poin Misi', '${user.volunteerPoints}', Icons.stars, Colors.orange),
+                    _buildStatCard('Poin Misi'.tr(context), '${user.volunteerPoints}', Icons.stars, Colors.orange),
                     const SizedBox(width: 16),
-                    _buildStatCard('Level', user.volunteerLevel, Icons.military_tech, Colors.blue),
+                    _buildStatCard('Level'.tr(context), user.volunteerLevel, Icons.military_tech, Colors.blue),
                   ],
                 ),
 
                 const SizedBox(height: 32),
 
                 // 4. RADAR MISI DARURAT
-                Text('RADAR INSIDEN', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                Text('RADAR INSIDEN'.tr(context), style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 const SizedBox(height: 12),
                 user.isAvailableForMission 
                 ? Container(
@@ -221,21 +222,21 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                               child: const Icon(Icons.warning, color: Colors.red, size: 20),
                             ),
                             const SizedBox(width: 12),
-                            const Text('PANGGILAN DARURAT!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+                            Text('PANGGILAN DARURAT!'.tr(context), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const Text('Kecelakaan lalu lintas ganda, butuh evakuasi medis segera.', style: TextStyle(color: Colors.white, fontSize: 14)),
+                        Text('Kecelakaan lalu lintas ganda, butuh evakuasi medis segera.'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 14)),
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             const Icon(Icons.location_on, color: Colors.white70, size: 14),
                             const SizedBox(width: 4),
-                            const Text('1.2 KM (Simpang Lima)', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                            Text('1.2 KM (Simpang Lima)'.tr(context), style: const TextStyle(color: Colors.white70, fontSize: 12)),
                             const Spacer(),
                             const Icon(Icons.timer, color: Colors.white70, size: 14),
                             const SizedBox(width: 4),
-                            const Text('Barusan', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                            Text('Barusan'.tr(context), style: const TextStyle(color: Colors.white70, fontSize: 12)),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -249,9 +250,9 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Mengalihkan ke Navigasi Misi...')));
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Mengalihkan ke Navigasi Misi...'.tr(context))));
                             },
-                            child: const Text('TERIMA MISI INI', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
+                            child: Text('TERIMA MISI INI'.tr(context), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16)),
                           ),
                         )
                       ],
@@ -269,9 +270,9 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                         children: [
                           Icon(Icons.gpp_maybe, size: 48, color: Colors.grey.shade400),
                           const SizedBox(height: 16),
-                          Text('Radar Misi Nonaktif', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontWeight: FontWeight.bold, fontSize: 16)),
+                          Text('Radar Misi Nonaktif'.tr(context), style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontWeight: FontWeight.bold, fontSize: 16)),
                           const SizedBox(height: 8),
-                          Text('Hidupkan ON DUTY untuk melihat panggilan darurat di sekitar Anda.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
+                          Text('Hidupkan ON DUTY untuk melihat panggilan darurat di sekitar Anda.'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: Colors.grey.shade500, fontSize: 12)),
                         ],
                       ),
                     ),
@@ -280,7 +281,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                 const SizedBox(height: 32),
 
                 // 5. FITUR PENUNJANG
-                Text('KOORDINASI & ALAT', style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                Text('KOORDINASI & ALAT'.tr(context), style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 const SizedBox(height: 12),
                 GridView.count(
                   crossAxisCount: 2,
@@ -289,10 +290,10 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    _buildGridMenu('Live Chat Posko', Icons.headset_mic, Colors.blue),
-                    _buildGridMenu('Panduan Medis', Icons.health_and_safety, Colors.red),
-                    _buildGridMenu('Relawan Aktif', Icons.group, Colors.purple),
-                    _buildGridMenu('Riwayat Misi', Icons.history, Colors.orange),
+                    _buildGridMenu('Live Chat Posko'.tr(context), Icons.headset_mic, Colors.blue),
+                    _buildGridMenu('Panduan Medis'.tr(context), Icons.health_and_safety, Colors.red),
+                    _buildGridMenu('Relawan Aktif'.tr(context), Icons.group, Colors.purple),
+                    _buildGridMenu('Riwayat Misi'.tr(context), Icons.history, Colors.orange),
                   ],
                 ),
                 

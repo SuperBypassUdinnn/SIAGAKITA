@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/role_placeholder.dart';
+import '../../core/localization/app_localization.dart';
 import '../auth/login_screen.dart';
 
 class AdminMainScreen extends StatefulWidget {
@@ -14,19 +15,19 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
 
   static const _roleColor = Color(0xFFA855F7);
 
-  static const _tabs = [
-    PlaceholderTab(Icons.bar_chart_outlined, Icons.bar_chart, 'Statistik', 'Statistik Sistem', 'Pantau data dan tren kejadian seluruh wilayah.', _roleColor),
-    PlaceholderTab(Icons.manage_accounts_outlined, Icons.manage_accounts, 'User', 'Kelola Pengguna', 'Verifikasi, aktifkan, atau nonaktifkan akun pengguna.', Colors.blue),
-    PlaceholderTab(Icons.folder_open_outlined, Icons.folder_open, 'Laporan', 'Kelola Laporan', 'Tinjau dan moderasi semua laporan masuk.', Colors.orange),
-    PlaceholderTab(Icons.settings_outlined, Icons.settings, 'Setting', 'Pengaturan Sistem', 'Konfigurasi sistem dan parameter aplikasi.', Colors.grey),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final tab = _tabs[_currentIndex];
+    final tabs = [
+      PlaceholderTab(Icons.bar_chart_outlined, Icons.bar_chart, 'Statistik'.tr(context), 'Statistik Sistem'.tr(context), 'Pantau data dan tren kejadian seluruh wilayah.'.tr(context), _roleColor),
+      PlaceholderTab(Icons.manage_accounts_outlined, Icons.manage_accounts, 'User'.tr(context), 'Kelola Pengguna'.tr(context), 'Verifikasi, aktifkan, atau nonaktifkan akun pengguna.'.tr(context), Colors.blue),
+      PlaceholderTab(Icons.folder_open_outlined, Icons.folder_open, 'Laporan'.tr(context), 'Kelola Laporan'.tr(context), 'Tinjau dan moderasi semua laporan masuk.'.tr(context), Colors.orange),
+      PlaceholderTab(Icons.settings_outlined, Icons.settings, 'Setting'.tr(context), 'Pengaturan Sistem'.tr(context), 'Konfigurasi sistem dan parameter aplikasi.'.tr(context), Colors.grey),
+    ];
+    
+    final tab = tabs[_currentIndex];
     return Scaffold(
       body: RolePlaceholderBody(
-        role: 'Administrator',
+        role: 'Administrator'.tr(context),
         roleColor: _roleColor,
         tabName: tab.name,
         tabDescription: tab.description,
@@ -45,7 +46,7 @@ class _AdminMainScreenState extends State<AdminMainScreen> {
           currentIndex: _currentIndex,
           selectedItemColor: _roleColor,
           onTap: (i) => setState(() => _currentIndex = i),
-          items: _tabs.map((t) => BottomNavigationBarItem(
+          items: tabs.map((t) => BottomNavigationBarItem(
             icon: Icon(t.icon),
             activeIcon: Icon(t.activeIcon),
             label: t.label,

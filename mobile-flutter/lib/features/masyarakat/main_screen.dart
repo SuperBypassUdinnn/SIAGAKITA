@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import 'home_screen.dart';
 import 'guide_screen.dart';
 import 'map_screen.dart';
@@ -31,31 +32,31 @@ class _MainScreenState extends State<MainScreen> {
         ];
 
         final List<BottomNavigationBarItem> navItems = [
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.shield_outlined),
             activeIcon: Icon(Icons.shield),
-            label: 'Beranda',
+            label: 'Beranda'.tr(context),
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_outlined),
             activeIcon: Icon(Icons.menu_book),
-            label: 'Panduan',
+            label: 'Panduan'.tr(context),
           ),
           if (isRelawan)
-            const BottomNavigationBarItem(
+            BottomNavigationBarItem(
               icon: Icon(Icons.radar_outlined),
               activeIcon: Icon(Icons.radar),
-              label: 'Operasi',
+              label: 'Operasi'.tr(context),
             ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.map_outlined),
             activeIcon: Icon(Icons.map),
-            label: 'Map',
+            label: 'Map'.tr(context),
           ),
-          const BottomNavigationBarItem(
+          BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
             activeIcon: Icon(Icons.person),
-            label: 'Profil',
+            label: 'Profil'.tr(context),
           ),
         ];
 

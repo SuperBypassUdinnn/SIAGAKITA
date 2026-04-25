@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/widgets/role_placeholder.dart';
+import '../../core/localization/app_localization.dart';
 import '../auth/login_screen.dart';
 
 class InstansiMainScreen extends StatefulWidget {
@@ -14,19 +15,18 @@ class _InstansiMainScreenState extends State<InstansiMainScreen> {
 
   static const _roleColor = Color(0xFFFF7418);
 
-  static const _tabs = [
-    PlaceholderTab(Icons.dashboard_outlined, Icons.dashboard, 'Dashboard', 'Dashboard', 'Ringkasan statistik kejadian aktif di wilayah Anda.', _roleColor),
-    PlaceholderTab(Icons.inbox_outlined, Icons.inbox, 'Laporan', 'Laporan Masuk', 'Kelola laporan darurat yang masuk dari masyarakat.', Colors.red),
-    PlaceholderTab(Icons.people_outline, Icons.people, 'Tim', 'Tim Lapangan', 'Kelola penugasan tim dan sumber daya lapangan.', Colors.blue),
-    PlaceholderTab(Icons.account_balance_outlined, Icons.account_balance, 'Profil', 'Profil Instansi', 'Informasi dan pengaturan instansi Anda.', Colors.teal),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final tab = _tabs[_currentIndex];
+    final tabs = [
+      PlaceholderTab(Icons.dashboard_outlined, Icons.dashboard, 'Dashboard'.tr(context), 'Dashboard'.tr(context), 'Ringkasan statistik kejadian aktif di wilayah Anda.'.tr(context), _roleColor),
+      PlaceholderTab(Icons.inbox_outlined, Icons.inbox, 'Laporan'.tr(context), 'Laporan Masuk'.tr(context), 'Kelola laporan darurat yang masuk dari masyarakat.'.tr(context), Colors.red),
+      PlaceholderTab(Icons.people_outline, Icons.people, 'Tim'.tr(context), 'Tim Lapangan'.tr(context), 'Kelola penugasan tim dan sumber daya lapangan.'.tr(context), Colors.blue),
+      PlaceholderTab(Icons.account_balance_outlined, Icons.account_balance, 'Profil'.tr(context), 'Profil Instansi'.tr(context), 'Informasi dan pengaturan instansi Anda.'.tr(context), Colors.teal),
+    ];
+    final tab = tabs[_currentIndex];
     return Scaffold(
       body: RolePlaceholderBody(
-        role: 'Instansi Penyelamat',
+        role: 'Instansi Penyelamat'.tr(context),
         roleColor: _roleColor,
         tabName: tab.name,
         tabDescription: tab.description,
@@ -45,7 +45,7 @@ class _InstansiMainScreenState extends State<InstansiMainScreen> {
           currentIndex: _currentIndex,
           selectedItemColor: _roleColor,
           onTap: (i) => setState(() => _currentIndex = i),
-          items: _tabs.map((t) => BottomNavigationBarItem(
+          items: tabs.map((t) => BottomNavigationBarItem(
             icon: Icon(t.icon),
             activeIcon: Icon(t.activeIcon),
             label: t.label,

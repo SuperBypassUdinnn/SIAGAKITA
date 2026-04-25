@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import 'biodata_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -106,7 +107,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   shadowColor: primaryColor.withValues(alpha: 0.5),
                 ),
                 child: Text(
-                  _currentStep == 3 ? 'Lanjut Isi Biodata' : 'Lanjut',
+                  _currentStep == 3 ? 'Lanjut Isi Biodata'.tr(context) : 'Lanjut'.tr(context),
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -115,12 +116,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Sudah punya akun?', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
+                    Text('Sudah punya akun?'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
                     TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
                       },
-                      child: Text('Masuk sekarang', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                      child: Text('Masuk sekarang'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -149,9 +150,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       key: const ValueKey('step0'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Buat Akun Baru', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Buat Akun Baru'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Mari bergabung ke dalam jejaring keselamatan kami.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Mari bergabung ke dalam jejaring keselamatan kami.'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         _buildTextField(_usernameController, 'Username', Icons.alternate_email, colors),
         _buildTextField(_nameKtpController, 'Nama Sesuai KTP', Icons.person_outline, colors),
@@ -171,17 +172,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.message_outlined, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Verifikasi Nomor', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Verifikasi Nomor'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Masukkan kode OTP yang kami kirimkan ke\n${_phoneController.text.isNotEmpty ? _phoneController.text : "nomor telepon Anda"}', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Masukkan kode OTP yang kami kirimkan ke\n${_phoneController.text.isNotEmpty ? _phoneController.text : "nomor telepon Anda".tr(context)}', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
-        _buildTextField(_otpController, 'Kode OTP', Icons.password, colors, inputType: TextInputType.number),
+        _buildTextField(_otpController, 'Kode OTP'.tr(context), Icons.password, colors, inputType: TextInputType.number),
         const SizedBox(height: 8),
         TextButton(
           onPressed: () {
             // Logika resend OTP
           },
-          child: Text('Kirim ulang kode OTP', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+          child: Text('Kirim ulang kode OTP'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
         ),
       ],
     );
@@ -194,9 +195,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.credit_card, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Foto KTP', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Foto KTP'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Mohon berikan foto KTP asli Anda untuk keperluan verifikasi keamanan.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Mohon berikan foto KTP asli Anda untuk keperluan verifikasi keamanan.'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         Container(
           height: 200,
@@ -210,7 +211,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               Icon(Icons.camera_alt, size: 40, color: colors.onSurface.withValues(alpha: 0.4)),
               const SizedBox(height: 12),
-              Text('Ketuk untuk mengambil foto KTP', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
+              Text('Ketuk untuk mengambil foto KTP'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
             ],
           ),
         ),
@@ -225,9 +226,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       children: [
         Icon(Icons.face, size: 64, color: primaryColor),
         const SizedBox(height: 24),
-        Text('Foto Wajah', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
+        Text('Foto Wajah'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface, fontSize: 26, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text('Ambil foto wajah (selfie) untuk pencocokan biometrik.', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
+        Text('Ambil foto wajah (selfie) untuk pencocokan biometrik.'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 14)),
         const SizedBox(height: 32),
         Container(
           height: 200,
@@ -241,7 +242,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             children: [
               Icon(Icons.camera_front, size: 40, color: colors.onSurface.withValues(alpha: 0.4)),
               const SizedBox(height: 12),
-              Text('Ketuk untuk\nSelfie', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
+              Text('Ketuk untuk\nSelfie'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
             ],
           ),
         ),

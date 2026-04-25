@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
@@ -17,18 +18,18 @@ class MapScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              const Text('JEJARING KESELAMATAN LOKAL', style: TextStyle(color: Color(0xFFFF7418), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              Text('JEJARING KESELAMATAN LOKAL'.tr(context), style: const TextStyle(color: Color(0xFFFF7418), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 4),
-              Text('RADAR SIAGA & EVAKUASI', style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
+              Text('RADAR SIAGA & EVAKUASI'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
               Row(
                 children: [
-                  Text('Radius 5KM', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
+                  Text('Radius 5KM'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12, fontWeight: FontWeight.w500)),
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(color: Colors.green[600], borderRadius: BorderRadius.circular(4)),
-                    child: const Text('AKTIF', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                    child: Text('AKTIF'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                   )
                 ],
               ),
@@ -86,7 +87,7 @@ class MapScreen extends StatelessWidget {
                                 decoration: BoxDecoration(color: Colors.blue[500], borderRadius: BorderRadius.circular(12)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [Icon(Icons.favorite, color: Colors.white, size: 10), SizedBox(width: 4), Text('Relawan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
+                                  children: [const Icon(Icons.favorite, color: Colors.white, size: 10), const SizedBox(width: 4), Text('Relawan'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
                                 ),
                               ),
                             ),
@@ -97,7 +98,7 @@ class MapScreen extends StatelessWidget {
                                 decoration: BoxDecoration(color: Colors.blue[500], borderRadius: BorderRadius.circular(12)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [Icon(Icons.favorite, color: Colors.white, size: 10), SizedBox(width: 4), Text('Relawan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
+                                  children: [const Icon(Icons.favorite, color: Colors.white, size: 10), const SizedBox(width: 4), Text('Relawan'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
                                 ),
                               ),
                             ),
@@ -110,7 +111,7 @@ class MapScreen extends StatelessWidget {
                                 decoration: BoxDecoration(color: Colors.green[500], borderRadius: BorderRadius.circular(12)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [Icon(Icons.verified_user, color: Colors.white, size: 10), SizedBox(width: 4), Text('Titik Kumpul', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
+                                  children: [const Icon(Icons.verified_user, color: Colors.white, size: 10), const SizedBox(width: 4), Text('Titik Kumpul'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold))],
                                 ),
                               ),
                             ),
@@ -123,7 +124,7 @@ class MapScreen extends StatelessWidget {
                                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
                                 child: Row(
                                   mainAxisSize: MainAxisSize.min,
-                                  children: const [Icon(Icons.healing, color: Colors.red, size: 10), SizedBox(width: 4), Text('Klinik', style: TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))],
+                                  children: [const Icon(Icons.healing, color: Colors.red, size: 10), const SizedBox(width: 4), Text('Klinik'.tr(context), style: const TextStyle(color: Colors.black, fontSize: 10, fontWeight: FontWeight.bold))],
                                 ),
                               ),
                             ),
@@ -143,7 +144,7 @@ class MapScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('LOKASI ANDA', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.bold)),
+                                  Text('LOKASI ANDA'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.bold)),
                                   Text('Lhoknga, Aceh', style: TextStyle(color: colors.onSurface, fontSize: 12, fontWeight: FontWeight.bold)),
                                 ],
                               )
@@ -159,8 +160,8 @@ class MapScreen extends StatelessWidget {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('RELAWAN SIAGA', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.bold)),
-                                  Text('12 di sekitar', style: TextStyle(color: colors.onSurface, fontSize: 12, fontWeight: FontWeight.bold)),
+                                  Text('RELAWAN SIAGA'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10, fontWeight: FontWeight.bold)),
+                                  Text('12 di sekitar'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 12, fontWeight: FontWeight.bold)),
                                 ],
                               )
                             ],
@@ -174,14 +175,14 @@ class MapScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
               // Status Transmisi
-              Text('STATUS TRANSMISI (SIMULASI SOS)', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
+              Text('STATUS TRANSMISI (SIMULASI SOS)'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
               const SizedBox(height: 12),
               
-              _buildStatusCard('Koordinat GPS Terkunci (Akurasi 3m)', Colors.green, context, isDark),
+              _buildStatusCard('Koordinat GPS Terkunci (Akurasi 3m)'.tr(context), Colors.green, context, isDark),
               const SizedBox(height: 8),
-              _buildStatusCard('Menyiarkan ke relawan radius 5KM...', Colors.amber, context, isDark),
+              _buildStatusCard('Menyiarkan ke relawan radius 5KM...'.tr(context), Colors.amber, context, isDark),
               const SizedBox(height: 8),
-              _buildStatusCard('Menunggu respons Command Center 112', Colors.grey, context, isDark, isMuted: true),
+              _buildStatusCard('Menunggu respons Command Center 112'.tr(context), Colors.grey, context, isDark, isMuted: true),
             ],
           ),
         ),
