@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localization.dart';
 
 /// Data model untuk tab di placeholder screens
 class PlaceholderTab {
@@ -140,7 +141,7 @@ class RolePlaceholderBody extends StatelessWidget {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Halaman ini sedang dalam pengembangan',
+                          'Halaman ini sedang dalam pengembangan'.tr(context),
                           style: TextStyle(
                             color: colors.onSurface.withValues(alpha: 0.5),
                             fontSize: 12,

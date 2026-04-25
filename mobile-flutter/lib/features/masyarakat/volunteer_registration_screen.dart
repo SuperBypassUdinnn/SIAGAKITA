@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/models/user_model.dart';
+import '../../core/localization/app_localization.dart';
 import 'dart:async';
 
 class VolunteerRegistrationScreen extends StatefulWidget {
@@ -24,14 +25,14 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
     
     if (!_hasMockKtp || !_hasMockSertifikat) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Anda wajib mengunggah KTP dan Sertifikat Keahlian (atau simulasikan dengan menekan kotak upload)')),
+        SnackBar(content: Text('Anda wajib mengunggah KTP dan Sertifikat Keahlian (atau simulasikan dengan menekan kotak upload)'.tr(context))),
       );
       return;
     }
     
     if (!_acceptedTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Harap centang persetujuan syarat dan ketentuan.')),
+        SnackBar(content: Text('Harap centang persetujuan syarat dan ketentuan.'.tr(context))),
       );
       return;
     }
@@ -49,7 +50,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Pengajuan Diterima. Status Anda kini Pending Review.')),
+          SnackBar(content: Text('Pengajuan Diterima. Status Anda kini Pending Review.'.tr(context))),
         );
         Navigator.pop(context); // Go back to profile
       }
@@ -85,7 +86,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
             ),
             const SizedBox(height: 8),
             Text(
-              isUploaded ? '$title Tersimpan' : 'Unggah $title',
+              isUploaded ? '$title ${'Tersimpan'.tr(context)}' : '${'Unggah'.tr(context)} $title',
               style: TextStyle(
                 color: isUploaded ? Colors.green : (isDark ? Colors.white70 : Colors.grey.shade800),
                 fontWeight: FontWeight.bold,
@@ -93,7 +94,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
             ),
             if (!isUploaded)
               Text(
-                '(Tekan untuk simulasi unggah file)',
+                '(Tekan untuk simulasi unggah file)'.tr(context),
                 style: TextStyle(color: isDark ? Colors.grey.shade500 : Colors.grey.shade600, fontSize: 10),
               )
           ],
@@ -111,7 +112,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: const Text('PENDAFTARAN RELAWAN', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
+        title: Text('PENDAFTARAN RELAWAN'.tr(context), style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 16, letterSpacing: 1)),
         backgroundColor: const Color(0xFF0D1B3E),
         foregroundColor: Colors.white,
       ),
@@ -123,7 +124,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Misi Penyelamatan First Responder',
+                'Misi Penyelamatan First Responder'.tr(context),
                 style: TextStyle(
                   color: primaryTextColor,
                   fontSize: 24,
@@ -132,17 +133,17 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
               ),
               const SizedBox(height: 8),
               Text(
-                'SiagaKita memanggil Anda yang memiliki kapabilitas medis / evakuasi gawat darurat. Pengajuan akan ditinjau oleh Admin daerah.',
+                'SiagaKita memanggil Anda yang memiliki kapabilitas medis / evakuasi gawat darurat. Pengajuan akan ditinjau oleh Admin daerah.'.tr(context),
                 style: TextStyle(color: isDark ? Colors.white70 : colors.onSurface.withValues(alpha: 0.6), height: 1.5),
               ),
               const SizedBox(height: 32),
               
-              Text('PILIHAN SPESIALISASI', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Text('PILIHAN SPESIALISASI'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 value: _selectedSpecialization,
                 decoration: InputDecoration(
-                  labelText: 'Keahlian Relawan',
+                  labelText: 'Keahlian Relawan'.tr(context),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 ),
                 items: ['Medis & First Aid', 'Evakuasi & SAR', 'Logistik & Dapur Umum', 'Komunikasi & Operator']
@@ -151,35 +152,35 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
                 onChanged: (val) {
                   setState(() => _selectedSpecialization = val);
                 },
-                validator: (v) => v == null ? 'Wajib memilih spesialisasi' : null,
+                validator: (v) => v == null ? 'Wajib memilih spesialisasi'.tr(context) : null,
               ),
 
               const SizedBox(height: 32),
               
-              Text('PENGALAMAN MEDIS / ORGANISASI', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Text('PENGALAMAN MEDIS / ORGANISASI'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 12),
               TextFormField(
                 controller: _expCtrl,
                 maxLines: 4,
                 decoration: InputDecoration(
-                  hintText: 'Contoh: Mantan petugas medis PMI, Relawan Damkar...',
+                  hintText: 'Contoh: Mantan petugas medis PMI, Relawan Damkar...'.tr(context),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: Colors.orange, width: 2),
                   ),
                 ),
-                validator: (v) => (v == null || v.isEmpty) ? 'Harap uraikan pengalaman Anda' : null,
+                validator: (v) => (v == null || v.isEmpty) ? 'Harap uraikan pengalaman Anda'.tr(context) : null,
               ),
               
               const SizedBox(height: 32),
-              Text('VERIFIKASI DOKUMEN', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+              Text('VERIFIKASI DOKUMEN'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 12),
-              _buildMockUploadBox('Foto KTP', _hasMockKtp, () {
+              _buildMockUploadBox('Foto KTP'.tr(context), _hasMockKtp, () {
                 setState(() => _hasMockKtp = true);
               }, context),
               const SizedBox(height: 16),
-              _buildMockUploadBox('Sertifikat Keahlian', _hasMockSertifikat, () {
+              _buildMockUploadBox('Sertifikat Keahlian'.tr(context), _hasMockSertifikat, () {
                 setState(() => _hasMockSertifikat = true);
               }, context),
               
@@ -201,7 +202,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'Saya menyatakan bahwa dokumen yang dilampirkan adalah benar, dan saya bersedia dipanggil dalam situasi darurat di area jangkauan saya sesuai standar operasional yang berlaku.',
+                      'Saya menyatakan bahwa dokumen yang dilampirkan adalah benar, dan saya bersedia dipanggil dalam situasi darurat di area jangkauan saya sesuai standar operasional yang berlaku.'.tr(context),
                       style: TextStyle(color: isDark ? Colors.white70 : colors.onSurface.withValues(alpha: 0.8), fontSize: 12, height: 1.4),
                     ),
                   ),
@@ -222,7 +223,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
                   onPressed: _isLoading ? null : _submit,
                   child: _isLoading 
                       ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('SUBMIT PENGAJUAN', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+                      : Text('SUBMIT PENGAJUAN'.tr(context), style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
                 ),
               ),
               const SizedBox(height: 48),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'core/localization/app_localization.dart';
 import 'features/auth/login_screen.dart';
 
 void main() {
@@ -9,6 +11,7 @@ class SiagaKitaApp extends StatefulWidget {
   const SiagaKitaApp({super.key});
 
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.dark);
+  static final ValueNotifier<Locale> localeNotifier = ValueNotifier(AppLocalization.localeId);
 
   @override
   State<SiagaKitaApp> createState() => _SiagaKitaAppState();
@@ -30,10 +33,23 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: SiagaKitaApp.themeNotifier,
       builder: (_, ThemeMode currentMode, child) {
+        return ValueListenableBuilder<Locale>(
+          valueListenable: SiagaKitaApp.localeNotifier,
+          builder: (_, Locale currentLocale, __) {
         return MaterialApp(
           title: 'SiagaKita',
           debugShowCheckedModeBanner: false,
           themeMode: currentMode,
+          locale: currentLocale,
+          supportedLocales: const [
+            AppLocalization.localeId,
+            AppLocalization.localeEn,
+          ],
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
           theme: ThemeData(
             brightness: Brightness.light,
             primaryColor: primaryColor,
@@ -81,6 +97,8 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
             ),
           ),
           home: const LoginScreen(),
+        );
+          },
         );
       },
     );

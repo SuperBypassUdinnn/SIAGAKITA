@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../auth/login_screen.dart';
+import '../../core/localization/app_localization.dart';
 import '../../core/models/user_model.dart';
 import 'edit_profile_screen.dart';
 import 'settings_screen.dart';
@@ -21,21 +22,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
         margin: const EdgeInsets.only(top: 8),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(color: Colors.orange, borderRadius: BorderRadius.circular(8)),
-        child: const Text('Relawan Terverifikasi', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+        child: Text('Relawan Terverifikasi'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
       );
     } else if (user.volunteerStatus == 'pending') {
       return Container(
         margin: const EdgeInsets.only(top: 8),
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         decoration: BoxDecoration(color: Colors.grey.shade600, borderRadius: BorderRadius.circular(8)),
-        child: const Text('Menunggu Verifikasi', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+        child: Text('Menunggu Verifikasi'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
       );
     }
     return Container(
       margin: const EdgeInsets.only(top: 8),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: const Color(0xFF0D1B3E).withValues(alpha: 0.8), borderRadius: BorderRadius.circular(8)),
-      child: const Text('Bukan Relawan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+      child: Text('Bukan Relawan'.tr(context), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -54,14 +55,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Profil Pengguna', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold)),
+        title: Text('Profil Pengguna'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.orange),
-            tooltip: 'Edit Profil',
+            tooltip: 'Edit Profil'.tr(context),
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
             },
@@ -99,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(user.name + (user.age != null ? ' (${user.age} Tahun)' : ''), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryTextColor)),
+                          Text(user.name + (user.age != null ? ' (${user.age} ${'Tahun'.tr(context)})' : ''), style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: primaryTextColor)),
                           const SizedBox(height: 2),
                           Text('ID/NIM: ${user.id}', style: TextStyle(fontSize: 12, color: hintColor, fontFamily: 'monospace')),
                           _buildVolunteerBadge(user),
@@ -112,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
 
                 // 2. Kategori 1: Informasi Pribadi
-                Text('INFORMASI PRIBADI', style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
+                Text('INFORMASI PRIBADI'.tr(context), style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
                 const SizedBox(height: 8),
                 Card(
                   color: cardColor,
@@ -131,27 +132,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
                         leading: Icon(Icons.phone, color: primaryTextColor),
-                        title: Text('Nomor Telepon', style: TextStyle(fontSize: 12, color: hintColor)),
+                        title: Text('Nomor Telepon'.tr(context), style: TextStyle(fontSize: 12, color: hintColor)),
                         subtitle: Text(user.phoneNumber ?? '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
                         leading: Icon(Icons.cake, color: primaryTextColor),
-                        title: Text('Tanggal Lahir / Umur', style: TextStyle(fontSize: 12, color: hintColor)),
-                        subtitle: Text(user.birthDate != null ? '${user.birthDate} (${user.age} Tahun)' : '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
+                        title: Text('Tanggal Lahir / Umur'.tr(context), style: TextStyle(fontSize: 12, color: hintColor)),
+                        subtitle: Text(user.birthDate != null ? '${user.birthDate} (${user.age} ${'Tahun'.tr(context)})' : '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
                         leading: Icon(Icons.location_on, color: primaryTextColor),
-                        title: Text('Domisili Terkini', style: TextStyle(fontSize: 12, color: hintColor)),
+                        title: Text('Domisili Terkini'.tr(context), style: TextStyle(fontSize: 12, color: hintColor)),
                         subtitle: Text(medData['address'] ?? '-', style: TextStyle(fontSize: 14, color: secondaryTextColor, fontWeight: FontWeight.w500)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
                         leading: Icon(Icons.info, color: primaryTextColor),
-                        title: Text('Bio / Deskripsi Profil', style: TextStyle(fontSize: 12, color: hintColor)),
+                        title: Text('Bio / Deskripsi Profil'.tr(context), style: TextStyle(fontSize: 12, color: hintColor)),
                         subtitle: Text(
-                          (user.bio?.trim().isEmpty ?? true) ? 'Belum ada biodata' : user.bio!,
+                          (user.bio?.trim().isEmpty ?? true) ? 'Belum ada biodata'.tr(context) : user.bio!,
                           style: TextStyle(fontSize: 14, color: (user.bio?.trim().isEmpty ?? true) ? hintColor : secondaryTextColor, fontStyle: (user.bio?.trim().isEmpty ?? true) ? FontStyle.italic : FontStyle.normal),
                         ),
                       ),
@@ -162,7 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
 
                 // 3. Kategori 2: Data Medis & Keamanan
-                Text('MEDIS & KEAMANAN', style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
+                Text('MEDIS & KEAMANAN'.tr(context), style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
                 const SizedBox(height: 8),
                 Card(
                   color: isDark ? Colors.red.withValues(alpha: 0.1) : Colors.red.shade50,
@@ -175,25 +176,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.bloodtype, color: Colors.red),
-                        title: Text('Golongan Darah', style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
+                        title: Text('Golongan Darah'.tr(context), style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
                         subtitle: Text(medData['blood_type'] ?? '-', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFFCDD2)),
                       ListTile(
                         leading: const Icon(Icons.monitor_weight_outlined, color: Colors.blue),
-                        title: Text('Berat & Tinggi', style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade300 : Colors.blueAccent)),
+                        title: Text('Berat & Tinggi'.tr(context), style: TextStyle(fontSize: 12, color: isDark ? Colors.blue.shade300 : Colors.blueAccent)),
                         subtitle: Text('${medData['weight'] ?? '-'} kg / ${medData['height'] ?? '-'} cm', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFFCDD2)),
                       ListTile(
                         leading: const Icon(Icons.warning, color: Colors.orange),
-                        title: Text('Alergi Utama', style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
+                        title: Text('Alergi Utama'.tr(context), style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
                         subtitle: Text(medData['allergies'] ?? '-', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
                       ),
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.red.withValues(alpha: 0.2) : const Color(0xFFFFCDD2)),
                       ListTile(
                         leading: const Icon(Icons.healing, color: Colors.red),
-                        title: Text('Riwayat Penyakit', style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
+                        title: Text('Riwayat Penyakit'.tr(context), style: TextStyle(fontSize: 12, color: isDark ? Colors.red.shade300 : Colors.redAccent)),
                         subtitle: Text(medData['medical_history'] ?? '-', style: TextStyle(fontSize: 14, color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
                       ),
                     ],
@@ -203,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
 
                 // 4. Kategori 3: Kontak Darurat
-                Text('KONTAK DARURAT', style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
+                Text('KONTAK DARURAT'.tr(context), style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
                 const SizedBox(height: 8),
                 Card(
                   color: cardColor,
@@ -215,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: emContacts.isEmpty
                       ? Padding(
                           padding: const EdgeInsets.all(24.0),
-                          child: Center(child: Text('Tidak ada kontak terdaftar', style: TextStyle(color: hintColor))),
+                          child: Center(child: Text('Tidak ada kontak terdaftar'.tr(context), style: TextStyle(color: hintColor))),
                         )
                       : ListView.separated(
                           shrinkWrap: true,
@@ -235,7 +236,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 icon: const Icon(Icons.call, color: Colors.green),
                                 onPressed: () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Memanggil ${contact['phone']}...')),
+                                    SnackBar(content: Text('${'Memanggil'.tr(context)} ${contact['phone']}...')),
                                   );
                                 },
                               ),
@@ -247,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 24),
 
                 // 5. Kategori 4: Pengaturan & Bantuan
-                Text('PENGATURAN & BANTUAN', style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
+                Text('PENGATURAN & BANTUAN'.tr(context), style: TextStyle(color: hintColor, fontWeight: FontWeight.bold, letterSpacing: 1, fontSize: 12)),
                 const SizedBox(height: 8),
                 Card(
                   color: cardColor,
@@ -260,7 +261,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       ListTile(
                         leading: Icon(Icons.settings, color: primaryTextColor),
-                        title: Text('Pengaturan', style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
+                        title: Text('Pengaturan'.tr(context), style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
                         trailing: Icon(Icons.chevron_right, color: hintColor),
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()));
@@ -269,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                       ListTile(
                         leading: Icon(Icons.info_outline, color: primaryTextColor),
-                        title: Text('Tentang Aplikasi', style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
+                        title: Text('Tentang Aplikasi'.tr(context), style: TextStyle(fontWeight: FontWeight.w600, color: primaryTextColor)),
                         trailing: Icon(Icons.chevron_right, color: hintColor),
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutScreen()));
@@ -292,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
                     icon: const Icon(Icons.medical_services, size: 20),
-                    label: const Text('DAFTAR MENJADI RELAWAN', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
+                    label: Text('DAFTAR MENJADI RELAWAN'.tr(context), style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1)),
                     onPressed: () {
                       Navigator.push(context, MaterialPageRoute(builder: (_) => const VolunteerRegistrationScreen()));
                     },
@@ -309,7 +310,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                   },
                   icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text('Keluar Aplikasi', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                  label: Text('Keluar Aplikasi'.tr(context), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     side: const BorderSide(color: Colors.red),

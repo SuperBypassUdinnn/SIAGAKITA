@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import '../../core/models/user_model.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -117,7 +118,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void _saveData() {
     if (_phoneCtrl.text.isNotEmpty && _phoneCtrl.text.length < 10) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nomor telepon pengguna minimal 10 digit')),
+        SnackBar(content: Text('Nomor telepon pengguna minimal 10 digit'.tr(context))),
       );
       return;
     }
@@ -127,13 +128,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       final c = _contacts[i];
       if ((c['name']?.isEmpty ?? true) || (c['relation']?.isEmpty ?? true) || (c['phone']?.isEmpty ?? true)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Form kontak baris ke-${i+1} belum lengkap!')),
+          SnackBar(content: Text('${'Form kontak baris ke'.tr(context)}-${i + 1} ${'belum lengkap!'.tr(context)}')),
         );
         return;
       }
       if ((c['phone']?.length ?? 0) < 10) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Nomor pada kontak ke-${i+1} minimal 10 digit!')),
+          SnackBar(content: Text('${'Nomor pada kontak ke'.tr(context)}-${i + 1} ${'minimal 10 digit!'.tr(context)}')),
         );
         return;
       }
@@ -159,7 +160,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Profil berhasil diperbarui.')),
+      SnackBar(content: Text('Profil berhasil diperbarui.'.tr(context))),
     );
     Navigator.pop(context);
   }
@@ -177,7 +178,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Edit Profil Utama', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryTextColor)),
+        title: Text('Edit Profil Utama'.tr(context), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: primaryTextColor)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: primaryTextColor),
@@ -188,7 +189,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 1. INFORMASI PRIBADI & DOMISILI
-            Text('INFORMASI PRIBADI', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text('INFORMASI PRIBADI'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 16),
             Card(
               color: cardColor,
@@ -204,7 +205,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     TextField(
                       controller: _phoneCtrl,
                       decoration: InputDecoration(
-                        labelText: 'Nomor Telepon Utama', 
+                        labelText: 'Nomor Telepon Utama'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       keyboardType: TextInputType.phone,
@@ -215,7 +216,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       readOnly: true,
                       onTap: () => _selectDate(context),
                       decoration: InputDecoration(
-                        labelText: 'Tanggal Lahir (DD-MM-YYYY)', 
+                        labelText: 'Tanggal Lahir (DD-MM-YYYY)'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         suffixIcon: const Icon(Icons.calendar_today, size: 18),
                       ),
@@ -225,7 +226,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       controller: _addressCtrl,
                       maxLines: 2,
                       decoration: InputDecoration(
-                        labelText: 'Domisili Lengkap', 
+                        labelText: 'Domisili Lengkap'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -234,7 +235,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       controller: _bioCtrl,
                       maxLines: 3,
                       decoration: InputDecoration(
-                        labelText: 'Bio Singkat', 
+                        labelText: 'Bio Singkat'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -246,7 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             const SizedBox(height: 32),
 
             // 2. DATA MEDIS & KEAMANAN
-            Text('DATA MEDIS & KEAMANAN', style: TextStyle(color: isDark ? Colors.red.shade300 : Colors.red, fontWeight: FontWeight.bold, letterSpacing: 1)),
+            Text('DATA MEDIS & KEAMANAN'.tr(context), style: TextStyle(color: isDark ? Colors.red.shade300 : Colors.red, fontWeight: FontWeight.bold, letterSpacing: 1)),
             const SizedBox(height: 16),
             Card(
               color: isDark ? Colors.red.withValues(alpha: 0.1) : Colors.red.shade50,
@@ -264,10 +265,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             ? _bloodTypeCtrl.text 
                             : null,
                       decoration: InputDecoration(
-                        labelText: 'Golongan Darah', 
+                        labelText: 'Golongan Darah'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      items: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Belum Tahu']
+                      items: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Belum Tahu'.tr(context)]
                           .map((val) => DropdownMenuItem(value: val, child: Text(val)))
                           .toList(),
                       onChanged: (val) {
@@ -282,7 +283,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             controller: _weightCtrl,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Berat (kg)', 
+                              labelText: 'Berat (kg)'.tr(context), 
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           ),
@@ -293,7 +294,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             controller: _heightCtrl,
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              labelText: 'Tinggi (cm)', 
+                              labelText: 'Tinggi (cm)'.tr(context), 
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                           ),
@@ -304,7 +305,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     TextField(
                       controller: _allergiesCtrl,
                       decoration: InputDecoration(
-                        labelText: 'Alergi Utama', 
+                        labelText: 'Alergi Utama'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -312,7 +313,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     TextField(
                       controller: _medicalHistoryCtrl,
                       decoration: InputDecoration(
-                        labelText: 'Riwayat Penyakit (Opsional)', 
+                        labelText: 'Riwayat Penyakit (Opsional)'.tr(context), 
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -327,11 +328,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('KONTAK DARURAT', style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
+                Text('KONTAK DARURAT'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
                 TextButton.icon(
                   onPressed: _addContact, 
                   icon: const Icon(Icons.add, color: Colors.orange, size: 18),
-                  label: const Text('Tambah', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                  label: Text('Tambah'.tr(context), style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
                 )
               ],
             ),
@@ -339,7 +340,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             if (_contacts.isEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Text('Belum ada kontak darurat.', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.4))),
+                child: Text('Belum ada kontak darurat.'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.4))),
               )
             else
               ...List.generate(_contacts.length, (index) {
@@ -358,7 +359,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text('Kontak Darurat #${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, color: primaryTextColor)),
+                            Text('${'Kontak Darurat'.tr(context)} #${index + 1}', style: TextStyle(fontWeight: FontWeight.bold, color: primaryTextColor)),
                             IconButton(
                               onPressed: () => _removeContact(index), 
                               icon: const Icon(Icons.delete_outline, color: Colors.red),
@@ -371,7 +372,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         TextFormField(
                           initialValue: _contacts[index]['name'],
                           onChanged: (val) => _contacts[index]['name'] = val,
-                          decoration: const InputDecoration(labelText: 'Nama Lengkap', isDense: true),
+                          decoration: InputDecoration(labelText: 'Nama Lengkap'.tr(context), isDense: true),
                         ),
                         const SizedBox(height: 12),
                         Row(
@@ -380,7 +381,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               child: TextFormField(
                                 initialValue: _contacts[index]['relation'],
                                 onChanged: (val) => _contacts[index]['relation'] = val,
-                                decoration: const InputDecoration(labelText: 'Hubungan', isDense: true),
+                                decoration: InputDecoration(labelText: 'Hubungan'.tr(context), isDense: true),
                               ),
                             ),
                             const SizedBox(width: 12),
@@ -390,7 +391,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                 initialValue: _contacts[index]['phone'],
                                 onChanged: (val) => _contacts[index]['phone'] = val,
                                 keyboardType: TextInputType.phone,
-                                decoration: const InputDecoration(labelText: 'No Hp', isDense: true),
+                                decoration: InputDecoration(labelText: 'No Hp'.tr(context), isDense: true),
                               ),
                             ),
                           ],
@@ -413,7 +414,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   elevation: 5,
                 ),
                 onPressed: _saveData,
-                child: const Text('Simpan Perubahan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                child: Text('Simpan Perubahan'.tr(context), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ),
             ),
             const SizedBox(height: 48),

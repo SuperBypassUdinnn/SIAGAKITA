@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
+import '../../main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -13,7 +15,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _smsAlerts = false;
   bool _locationTracking = true;
   bool _darkMode = true;
-  String _language = 'Bahasa Indonesia';
+  late String _language;
+  static const List<String> _availableLanguages = <String>['Bahasa Indonesia', 'English'];
+
+  @override
+  void initState() {
+    super.initState();
+    _language = SiagaKitaApp.localeNotifier.value.languageCode == AppLocalization.localeEn.languageCode
+        ? 'English'
+        : 'Bahasa Indonesia';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Pengaturan', style: TextStyle(fontWeight: FontWeight.bold, color: primaryTextColor)),
+        title: Text('Pengaturan'.tr(context), style: TextStyle(fontWeight: FontWeight.bold, color: primaryTextColor)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: primaryTextColor),
@@ -36,7 +47,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           // 1. Notifikasi & Lansiran
-          _buildSectionHeader('NOTIFIKASI & LANSIRAN', colors),
+          _buildSectionHeader('NOTIFIKASI & LANSIRAN'.tr(context), colors),
           Card(
             color: cardColor,
             elevation: isDark ? 0 : 2,
@@ -47,16 +58,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: Text('Notifikasi Push (Aplikasi)', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
-                  subtitle: Text('Peringatan darurat via aplikasi', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                  title: Text('Notifikasi Push (Aplikasi)'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  subtitle: Text('Peringatan darurat via aplikasi'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
                   activeColor: Colors.orange,
                   value: _pushNotifications,
                   onChanged: (val) => setState(() => _pushNotifications = val),
                 ),
                 Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                 SwitchListTile(
-                  title: Text('Lansiran SMS', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
-                  subtitle: Text('Kirim pesan SMS jika tidak ada koneksi internet', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                  title: Text('Lansiran SMS'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  subtitle: Text('Kirim pesan SMS jika tidak ada koneksi internet'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
                   activeColor: Colors.orange,
                   value: _smsAlerts,
                   onChanged: (val) => setState(() => _smsAlerts = val),
@@ -68,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // 2. Privasi & Lokasi
-          _buildSectionHeader('PRIVASI & LOKASI', colors),
+          _buildSectionHeader('PRIVASI & LOKASI'.tr(context), colors),
           Card(
             color: cardColor,
             elevation: isDark ? 0 : 2,
@@ -79,15 +90,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: Text('Akses Lokasi Latar Belakang', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
-                  subtitle: Text('Sangat disarankan untuk evakuasi cepat', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                  title: Text('Akses Lokasi Latar Belakang'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  subtitle: Text('Sangat disarankan untuk evakuasi cepat'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
                   activeColor: Colors.orange,
                   value: _locationTracking,
                   onChanged: (val) => setState(() => _locationTracking = val),
                 ),
                 Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                 ListTile(
-                  title: Text('Izin Akses Kamera & Galeri', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  title: Text('Izin Akses Kamera & Galeri'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                   onTap: () {},
                 ),
@@ -98,7 +109,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // 3. Tampilan & Aksesibilitas
-          _buildSectionHeader('TAMPILAN & AKSESIBILITAS', colors),
+          _buildSectionHeader('TAMPILAN & AKSESIBILITAS'.tr(context), colors),
           Card(
             color: cardColor,
             elevation: isDark ? 0 : 2,
@@ -109,17 +120,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               children: [
                 SwitchListTile(
-                  title: Text('Mode Gelap (Dark Mode)', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  title: Text('Mode Gelap (Dark Mode)'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   activeColor: Colors.orange,
                   value: _darkMode,
                   onChanged: (val) {
                     setState(() => _darkMode = val);
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Tema dikendalikan oleh sistem saat ini.')));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Tema dikendalikan oleh sistem saat ini.'.tr(context))));
                   },
                 ),
                 Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                 ListTile(
-                  title: Text('Bahasa', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  title: Text('Bahasa'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -128,7 +139,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       const Icon(Icons.chevron_right, color: Colors.grey),
                     ],
                   ),
-                  onTap: () {},
+                  onTap: () => _showLanguagePicker(context, cardColor),
                 ),
               ],
             ),
@@ -137,7 +148,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(height: 24),
 
           // 4. Akun & Keamanan
-          _buildSectionHeader('AKUN & KEAMANAN', colors),
+          _buildSectionHeader('AKUN & KEAMANAN'.tr(context), colors),
           Card(
             color: cardColor,
             elevation: isDark ? 0 : 2,
@@ -149,37 +160,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 ListTile(
                   leading: const Icon(Icons.lock_outline, color: Colors.grey),
-                  title: Text('Ubah Kata Sandi', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  title: Text('Ubah Kata Sandi'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                   onTap: () {},
                 ),
                 Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                 ListTile(
                   leading: const Icon(Icons.shield_outlined, color: Colors.grey),
-                  title: Text('Autentikasi Dua Langkah (2FA)', style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
-                  trailing: const Text('Nonaktif', style: TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
+                  title: Text('Autentikasi Dua Langkah (2FA)'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
+                  trailing: Text('Nonaktif'.tr(context), style: const TextStyle(color: Colors.red, fontSize: 12, fontWeight: FontWeight.bold)),
                   onTap: () {},
                 ),
                 Divider(height: 1, indent: 16, endIndent: 16, color: isDark ? Colors.grey.withValues(alpha: 0.2) : Colors.grey.shade200),
                 ListTile(
                   leading: const Icon(Icons.delete_forever, color: Colors.red),
-                  title: const Text('Hapus Akun', style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
+                  title: Text('Hapus Akun'.tr(context), style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600)),
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
                         backgroundColor: cardColor,
-                        title: const Text('Hapus Akun?'),
-                        content: const Text('Tindakan ini tidak dapat dibatalkan. Seluruh riwayat donasi darah, poin relawan, dan rekam medis darurat akan dihapus permanen.'),
+                        title: Text('Hapus Akun?'.tr(context)),
+                        content: Text('Tindakan ini tidak dapat dibatalkan. Seluruh riwayat donasi darah, poin relawan, dan rekam medis darurat akan dihapus permanen.'.tr(context)),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(ctx),
-                            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+                            child: Text('Batal'.tr(context), style: const TextStyle(color: Colors.grey)),
                           ),
                           ElevatedButton(
                             onPressed: () => Navigator.pop(ctx),
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                            child: const Text('Hapus Permanen'),
+                            child: Text('Hapus Permanen'.tr(context)),
                           ),
                         ],
                       ),
@@ -208,6 +219,50 @@ class _SettingsScreenState extends State<SettingsScreen> {
           fontSize: 12,
         ),
       ),
+    );
+  }
+
+  void _showLanguagePicker(BuildContext context, Color cardColor) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pilih Bahasa'.tr(context),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                ..._availableLanguages.map((language) {
+                  final isSelected = _language == language;
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(language == 'Bahasa Indonesia' ? language.tr(context) : language),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle, color: Colors.orange)
+                        : const Icon(Icons.circle_outlined, color: Colors.grey),
+                    onTap: () {
+                      setState(() => _language = language);
+                      SiagaKitaApp.localeNotifier.value =
+                          language == 'English' ? AppLocalization.localeEn : AppLocalization.localeId;
+                      Navigator.pop(sheetContext);
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

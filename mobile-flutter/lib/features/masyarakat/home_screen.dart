@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../main.dart'; // To access SiagaKitaApp.themeNotifier
+import '../../core/localization/app_localization.dart';
 import 'report_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -108,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                             ),
                           ),
                           Text(
-                            'Tekan dan tahan untuk bantuan',
+                            'Tekan dan tahan untuk bantuan'.tr(context),
                             style: TextStyle(
                               color: colors.onSurface.withValues(alpha: 0.6),
                               fontSize: 12,
@@ -205,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     ),
                                   ),
                                   Text(
-                                    'TAHAN 10 DETIK',
+                                    'TAHAN 10 DETIK'.tr(context),
                                     style: TextStyle(
                                       color: Colors.white.withValues(alpha: 0.9),
                                       fontSize: 10,
@@ -254,13 +255,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                       color: colors.secondary, size: 28),
                                 ),
                                 const SizedBox(height: 12),
-                                Text('Laporkan',
+                                Text('Laporkan'.tr(context),
                                     style: TextStyle(
                                         color: colors.onSurface,
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14)),
                                 const SizedBox(height: 4),
-                                Text('Kirim bukti & titik\nlokasi',
+                                Text('Kirim bukti & titik\nlokasi'.tr(context),
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10)),
@@ -290,13 +291,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                                     Icon(Icons.menu_book_outlined, color: primaryColor, size: 28),
                               ),
                               const SizedBox(height: 12),
-                              Text('Edukasi',
+                              Text('Edukasi'.tr(context),
                                   style: TextStyle(
                                       color: colors.onSurface,
                                       fontWeight: FontWeight.bold,
                                       fontSize: 14)),
                               const SizedBox(height: 4),
-                              Text('Panduan\npenyelamatan',
+                              Text('Panduan\npenyelamatan'.tr(context),
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       color: colors.onSurface.withValues(alpha: 0.5), fontSize: 10)),
@@ -340,11 +341,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                       ],
                     ),
-                    child: const Column(
+                    child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          'SINYAL SOS TERKIRIM!',
+                          'SINYAL SOS TERKIRIM!'.tr(context),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w900,
@@ -354,7 +355,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         ),
                         SizedBox(height: 4),
                         Text(
-                          'Bantuan sedang diarahkan ke lokasi Anda.',
+                          'Bantuan sedang diarahkan ke lokasi Anda.'.tr(context),
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w500,

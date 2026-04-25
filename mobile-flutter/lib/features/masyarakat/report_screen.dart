@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});
@@ -28,7 +29,7 @@ class _ReportScreenState extends State<ReportScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Buat Laporan', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
+        title: Text('Buat Laporan'.tr(context), style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: colors.onSurface),
@@ -87,7 +88,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Lokasi Otomatis Ditemukan', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14)),
+                                Text('Lokasi Otomatis Ditemukan'.tr(context), style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14)),
                                 Text('Jl. Cut Nyak Dhien, Lhoknga, Aceh', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12)),
                               ],
                             ),
@@ -102,7 +103,7 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 2. Kategori Darurat
-              Text('Kategori Darurat', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Kategori Darurat'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               SizedBox(
                 height: 100,
@@ -129,7 +130,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             Icon(cat['icon'], color: isSelected ? Colors.white : cat['color'], size: 32),
                             const SizedBox(height: 8),
                             Text(
-                              cat['title'],
+                              cat['title'].toString().tr(context),
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: isSelected ? Colors.white : colors.onSurface,
@@ -147,7 +148,7 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 3. Media
-              Text('Lampiran Foto & Audio', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Lampiran Foto & Audio'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -164,7 +165,7 @@ class _ReportScreenState extends State<ReportScreen> {
                         children: [
                           Icon(Icons.camera_alt, size: 32, color: colors.onSurface.withValues(alpha: 0.4)),
                           const SizedBox(height: 8),
-                          Text('Ketuk ambil foto', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12)),
+                          Text('Ketuk ambil foto'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12)),
                         ],
                       ),
                     ),
@@ -187,7 +188,7 @@ class _ReportScreenState extends State<ReportScreen> {
                             child: const Icon(Icons.mic, size: 24, color: Colors.red),
                           ),
                           const SizedBox(height: 8),
-                          Text('Tahan rekaman suara', textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12)),
+                          Text('Tahan rekaman suara'.tr(context), textAlign: TextAlign.center, style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6), fontSize: 12)),
                         ],
                       ),
                     ),
@@ -207,7 +208,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   maxLines: 3,
                   style: TextStyle(color: colors.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Ketik deksripsi tambahan jika ada...',
+                    hintText: 'Ketik deksripsi tambahan jika ada...'.tr(context),
                     hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
                     border: InputBorder.none,
                     contentPadding: const EdgeInsets.all(16),
@@ -217,15 +218,15 @@ class _ReportScreenState extends State<ReportScreen> {
               const SizedBox(height: 24),
 
               // 5. Urgency
-              Text('Tingkat Urgensi', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Tingkat Urgensi'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               Row(
                 children: [
-                  _buildUrgencyPill(0, 'Ringan', Colors.green, colors),
+                  _buildUrgencyPill(0, 'Ringan'.tr(context), Colors.green, colors),
                   const SizedBox(width: 12),
-                  _buildUrgencyPill(1, 'Sedang', Colors.orange, colors),
+                  _buildUrgencyPill(1, 'Sedang'.tr(context), Colors.orange, colors),
                   const SizedBox(width: 12),
-                  _buildUrgencyPill(2, 'Kritis', Colors.red, colors),
+                  _buildUrgencyPill(2, 'Kritis'.tr(context), Colors.red, colors),
                 ],
               ),
               
@@ -237,12 +238,12 @@ class _ReportScreenState extends State<ReportScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Laporan Berhasil Dikirim!'), backgroundColor: Colors.green),
+                      SnackBar(content: Text('Laporan Berhasil Dikirim!'.tr(context)), backgroundColor: Colors.green),
                     );
                     Navigator.pop(context);
                   },
                   icon: const Icon(Icons.send),
-                  label: const Text('Kirim Laporan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  label: Text('Kirim Laporan'.tr(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _urgencyLevel == 2 ? Colors.red : primaryColor,
                     foregroundColor: Colors.white,

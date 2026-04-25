@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import 'login_screen.dart';
 
 class BiodataScreen extends StatefulWidget {
@@ -59,7 +60,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
     return Scaffold(
       backgroundColor: colors.surface,
       appBar: AppBar(
-        title: Text('Lengkapi Biodata', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
+        title: Text('Lengkapi Biodata'.tr(context), style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         iconTheme: IconThemeData(color: colors.onSurface),
@@ -71,7 +72,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Langkah Terakhir!',
+                'Langkah Terakhir!'.tr(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: primaryColor,
@@ -82,7 +83,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Data kesehatan ini sangat penting untuk penanganan medis darurat yang tepat sasaran.',
+                'Data kesehatan ini sangat penting untuk penanganan medis darurat yang tepat sasaran.'.tr(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colors.onSurface.withValues(alpha: 0.6),
@@ -92,20 +93,20 @@ class _BiodataScreenState extends State<BiodataScreen> {
               const SizedBox(height: 32),
 
               // Fisik & Kesehatan
-              Text('Fisik & Kesehatan', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Fisik & Kesehatan'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text('Data ini mempermudah tim penolong mengetahui karakteristik fisik Anda.', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+              Text('Data ini mempermudah tim penolong mengetahui karakteristik fisik Anda.'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
               const SizedBox(height: 16),
-              _buildDateField(_birthDateController, 'Tanggal Lahir (DD-MM-YYYY)', Icons.calendar_today, colors),
-              _buildDropdownField(_bloodTypeController, 'Gol. Darah', Icons.bloodtype, colors),
+              _buildDateField(_birthDateController, 'Tanggal Lahir (DD-MM-YYYY)'.tr(context), Icons.calendar_today, colors),
+              _buildDropdownField(_bloodTypeController, 'Gol. Darah'.tr(context), Icons.bloodtype, colors),
               Row(
                 children: [
                   Expanded(
-                    child: _buildTextField(_weightController, 'Berat Badan (kg)', Icons.monitor_weight_outlined, colors, inputType: TextInputType.number),
+                    child: _buildTextField(_weightController, 'Berat Badan (kg)'.tr(context), Icons.monitor_weight_outlined, colors, inputType: TextInputType.number),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: _buildTextField(_heightController, 'Tinggi Badan (cm)', Icons.height, colors, inputType: TextInputType.number),
+                    child: _buildTextField(_heightController, 'Tinggi Badan (cm)'.tr(context), Icons.height, colors, inputType: TextInputType.number),
                   ),
                 ],
               ),
@@ -113,18 +114,18 @@ class _BiodataScreenState extends State<BiodataScreen> {
               const SizedBox(height: 8),
               
               // Riwayat Medis & Alergi
-              Text('Riwayat Penyakit & Alergi', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Riwayat Penyakit & Alergi'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text('Kosongkan jika tidak ada. Data ini krusial untuk menghindari pantangan obat darurat.', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+              Text('Kosongkan jika tidak ada. Data ini krusial untuk menghindari pantangan obat darurat.'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
               const SizedBox(height: 16),
-              _buildTextField(_medicalHistoryController, 'Riwayat Medis (Misal: Asma, Hipertensi)', Icons.favorite_border, colors),
-              _buildTextField(_allergiesController, 'Alergi Utama (Misal: Kacang, Penisilin)', Icons.warning_amber_rounded, colors),
+              _buildTextField(_medicalHistoryController, 'Riwayat Medis (Misal: Asma, Hipertensi)'.tr(context), Icons.favorite_border, colors),
+              _buildTextField(_allergiesController, 'Alergi Utama (Misal: Kacang, Penisilin)'.tr(context), Icons.warning_amber_rounded, colors),
               const SizedBox(height: 8),
 
               // Alamat Lengkap
-              Text('Alamat Tempat Tinggal', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Alamat Tempat Tinggal'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text('Sebagai acuan domisili terdekat jika evakuasi diperlukan.', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+              Text('Sebagai acuan domisili terdekat jika evakuasi diperlukan.'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
               const SizedBox(height: 16),
               Container(
                 margin: const EdgeInsets.only(bottom: 24),
@@ -138,7 +139,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
                   maxLines: 3,
                   style: TextStyle(color: colors.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Alamat lengkap sesuai domisili...',
+                    hintText: 'Alamat lengkap sesuai domisili...'.tr(context),
                     hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
                     prefixIcon: Padding(
                       padding: const EdgeInsets.only(bottom: 48),
@@ -151,12 +152,12 @@ class _BiodataScreenState extends State<BiodataScreen> {
               ),
 
               // Kontak Darurat
-              Text('Kontak Darurat (Wali/Keluarga)', style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('Kontak Darurat (Wali/Keluarga)'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text('Orang yang akan dihubungi jika Anda dalam bahaya.', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+              Text('Orang yang akan dihubungi jika Anda dalam bahaya.'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
               const SizedBox(height: 16),
-              _buildTextField(_emergencyContactNameController, 'Nama Kontak Darurat', Icons.person_outline, colors),
-              _buildTextField(_emergencyContactPhoneController, 'Nomor Telepon Darurat', Icons.phone, colors, inputType: TextInputType.phone),
+              _buildTextField(_emergencyContactNameController, 'Nama Kontak Darurat'.tr(context), Icons.person_outline, colors),
+              _buildTextField(_emergencyContactPhoneController, 'Nomor Telepon Darurat'.tr(context), Icons.phone, colors, inputType: TextInputType.phone),
 
               const SizedBox(height: 32),
               ElevatedButton(
@@ -169,7 +170,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
                   elevation: 5,
                   shadowColor: primaryColor.withValues(alpha: 0.3),
                 ),
-                child: const Text('Simpan & Selesai', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text('Simpan & Selesai'.tr(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 32),
             ],

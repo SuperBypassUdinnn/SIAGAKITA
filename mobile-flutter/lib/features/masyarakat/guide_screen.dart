@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 
 class GuideScreen extends StatefulWidget {
   const GuideScreen({super.key});
@@ -58,12 +59,66 @@ class _GuideScreenState extends State<GuideScreen> {
     },
   ];
 
+  List<Map<String, dynamic>> _localizedGuides(BuildContext context) {
+    if (Localizations.localeOf(context).languageCode != AppLocalization.localeEn.languageCode) {
+      return _guides;
+    }
+
+    return [
+      {
+        'id': 1,
+        'title': 'Severe Bleeding',
+        'type': 'MEDICAL',
+        'steps': [
+          'Apply firm pressure on the wound with a clean cloth.',
+          'Raise the injured area above heart level if possible.',
+          'Do not remove the first cloth if soaked; add another on top.',
+          'Seek emergency help immediately.'
+        ],
+      },
+      {
+        'id': 2,
+        'title': 'Burn Injury',
+        'type': 'MEDICAL',
+        'steps': [
+          'Cool the burn under running water (not ice) for 15-20 minutes.',
+          'Remove clothing or jewelry around the area before swelling.',
+          'Cover loosely with plastic wrap or a clean cloth.',
+          'Do not pop blisters.'
+        ],
+      },
+      {
+        'id': 3,
+        'title': 'Choking (Adult)',
+        'type': 'MEDICAL',
+        'steps': [
+          'Stand behind the victim and wrap your arms around the waist.',
+          'Make a fist slightly above the navel.',
+          'Grab your fist with the other hand and thrust inward and upward (Heimlich maneuver).',
+          'Repeat until the object is expelled.'
+        ],
+      },
+      {
+        'id': 4,
+        'title': 'Earthquake',
+        'type': 'DISASTER',
+        'steps': [
+          'Drop, Cover, and Hold On.',
+          'Stay away from windows, glass, and heavy furniture.',
+          'If outdoors, move to an open area away from buildings, trees, and power lines.',
+          'Do not use elevators during evacuation.'
+        ],
+      },
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    final filteredGuides = _guides.where((g) => 
+    final localizedGuides = _localizedGuides(context);
+    final filteredGuides = localizedGuides.where((g) => 
       g['title'].toString().toLowerCase().contains(_searchQuery.toLowerCase()) ||
       g['type'].toString().toLowerCase().contains(_searchQuery.toLowerCase())
     ).toList();
@@ -94,13 +149,13 @@ class _GuideScreenState extends State<GuideScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Panduan Darurat', style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Panduan Darurat'.tr(context), style: TextStyle(color: colors.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 4),
                           Row(
-                            children: const [
-                              Icon(Icons.verified_user, color: Colors.green, size: 12),
-                              SizedBox(width: 4),
-                              Text('Database Lokal Aktif (Offline/Online)', style: TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w500)),
+                            children: [
+                              const Icon(Icons.verified_user, color: Colors.green, size: 12),
+                              const SizedBox(width: 4),
+                              Text('Database Lokal Aktif (Offline/Online)'.tr(context), style: const TextStyle(color: Colors.green, fontSize: 12, fontWeight: FontWeight.w500)),
                             ],
                           )
                         ],
@@ -119,7 +174,7 @@ class _GuideScreenState extends State<GuideScreen> {
                       style: TextStyle(color: colors.onSurface, fontSize: 14),
                       onChanged: (val) => setState(() => _searchQuery = val),
                       decoration: InputDecoration(
-                        hintText: "Cari tindakan (mis: Luka Bakar)...",
+                        hintText: "Cari tindakan (mis: Luka Bakar)...".tr(context),
                         hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.5)),
                         prefixIcon: Icon(Icons.search, color: colors.onSurface.withValues(alpha: 0.5), size: 20),
                         border: InputBorder.none,

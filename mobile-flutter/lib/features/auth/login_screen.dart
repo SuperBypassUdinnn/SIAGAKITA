@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/localization/app_localization.dart';
 import 'register_screen.dart';
 import '../masyarakat/main_screen.dart';
 import '../relawan/relawan_main_screen.dart';
@@ -15,6 +16,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   
   String _selectedMockRole = 'Masyarakat Umum';
+  static const List<String> _mockRoles = [
+    'Masyarakat Umum',
+    'Relawan (Terverifikasi)',
+    'Instansi Penyelamat',
+    'Admin Sistem',
+  ];
 
   void _login() {
     UserRole newRole = UserRole.masyarakat;
@@ -38,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (newRole == UserRole.instansi || newRole == UserRole.admin) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Dasbor $_selectedMockRole sedang dalam pengembangan')),
+        SnackBar(content: Text('${_selectedMockRole.tr(context)}: ${'Dasbor sedang dalam pengembangan'.tr(context)}')),
       );
       return;
     }
@@ -83,7 +90,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 32),
               Text(
-                'Selamat Datang',
+                'Selamat Datang'.tr(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colors.onSurface,
@@ -93,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Masuk untuk mengakses sistem pelaporan darurat dan jejaring relawan.',
+                'Masuk untuk mengakses sistem pelaporan darurat dan jejaring relawan.'.tr(context),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colors.onSurface.withValues(alpha: 0.6),
@@ -113,7 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   controller: _emailController,
                   style: TextStyle(color: colors.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Email Anda',
+                    hintText: 'Email Anda'.tr(context),
                     hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
                     prefixIcon: Icon(Icons.email_outlined, color: colors.onSurface.withValues(alpha: 0.5)),
                     border: InputBorder.none,
@@ -135,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   obscureText: true,
                   style: TextStyle(color: colors.onSurface),
                   decoration: InputDecoration(
-                    hintText: 'Kata Sandi',
+                    hintText: 'Kata Sandi'.tr(context),
                     hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
                     prefixIcon: Icon(Icons.lock_outline, color: colors.onSurface.withValues(alpha: 0.5)),
                     border: InputBorder.none,
@@ -159,8 +166,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     value: _selectedMockRole,
                     isExpanded: true,
                     icon: Icon(Icons.developer_mode, color: primaryColor),
-                    items: ['Masyarakat Umum', 'Relawan (Terverifikasi)', 'Instansi Penyelamat', 'Admin Sistem']
-                        .map((role) => DropdownMenuItem(value: role, child: Text('Login sebagai: $role', style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14))))
+                    items: _mockRoles
+                        .map((role) => DropdownMenuItem(
+                            value: role,
+                            child: Text('${'Login sebagai'.tr(context)}: ${role.tr(context)}',
+                                style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14))))
                         .toList(),
                     onChanged: (val) {
                       setState(() => _selectedMockRole = val!);
@@ -173,7 +183,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {},
-                  child: Text('Lupa sandi?', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                  child: Text('Lupa sandi?'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                 ),
               ),
               
@@ -188,21 +198,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   elevation: 5,
                   shadowColor: primaryColor.withValues(alpha: 0.5),
                 ),
-                child: const Text('Masuk', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text('Masuk'.tr(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
               const SizedBox(height: 24),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Belum punya akun?', style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
+                  Text('Belum punya akun?'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
                   TextButton(
                     onPressed: () {
                       Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       );
                     },
-                    child: Text('Daftar di sini', style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                    child: Text('Daftar di sini'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
