@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/localization/app_localization.dart';
 import 'register_screen.dart';
-import '../masyarakat/main_screen.dart';
-import '../relawan/relawan_main_screen.dart';
-import '../../core/models/user_model.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -12,47 +10,58 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
-  String _selectedMockRole = 'Masyarakat Umum';
-  static const List<String> _mockRoles = [
-    'Masyarakat Umum',
-    'Relawan (Terverifikasi)',
-    'Instansi Penyelamat',
-    'Admin Sistem',
-  ];
+  bool _obscurePassword = true;
+  bool _isLoading = false;
 
-  void _login() {
-    UserRole newRole = UserRole.masyarakat;
-    String volStatus = 'none';
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
-    if (_selectedMockRole == 'Relawan (Terverifikasi)') {
-      newRole = UserRole.relawan;
-      volStatus = 'approved';
-    } else if (_selectedMockRole == 'Instansi Penyelamat') {
-      newRole = UserRole.instansi;
-    } else if (_selectedMockRole == 'Admin Sistem') {
-      newRole = UserRole.admin;
-    }
-    
-    final user = UserModel.currentUser.value;
-    UserModel.currentUser.value = user.copyWith(
-      role: newRole,
-      volunteerStatus: volStatus,
-      isAvailableForMission: newRole == UserRole.relawan ? true : false,
-    );
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) return 'Email tidak boleh kosong';
+    final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!emailRegex.hasMatch(value.trim())) return 'Format email tidak valid';
+    return null;
+  }
 
-    if (newRole == UserRole.instansi || newRole == UserRole.admin) {
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) return 'Kata sandi tidak boleh kosong';
+    return null;
+  }
+
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isLoading = true);
+
+    // TODO: Ganti dengan AuthService.login() setelah integrasi API (Task 6)
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    if (mounted) {
+      setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('${_selectedMockRole.tr(context)}: ${'Dasbor sedang dalam pengembangan'.tr(context)}')),
+        SnackBar(content: Text('Integrasi API segera hadir'.tr(context))),
       );
-      return;
     }
-    
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const MainScreen()),
-    );
+  }
+
+  /// Navigasi ke RegisterScreen. Saat kembali, reset form agar
+  /// error validation login tidak tersisa (Fix #2).
+  void _goToRegister() {
+    Navigator.of(context)
+        .push(MaterialPageRoute(builder: (_) => const RegisterScreen()))
+        .then((_) {
+      if (mounted) {
+        _formKey.currentState?.reset();
+        _emailController.clear();
+        _passwordController.clear();
+      }
+    });
   }
 
   @override
@@ -60,163 +69,196 @@ class _LoginScreenState extends State<LoginScreen> {
     final colors = Theme.of(context).colorScheme;
     final primaryColor = Theme.of(context).primaryColor;
 
+    // Input decoration factory — error text muncul di bawah border,
+    // bukan di dalam border, sehingga kotak tidak melebar (Fix #1).
+    InputDecoration fieldDecoration({
+      required String hint,
+      required IconData prefixIcon,
+      Widget? suffixIcon,
+    }) {
+      final borderRadius = BorderRadius.circular(16);
+      return InputDecoration(
+        hintText: hint,
+        hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
+        prefixIcon: Icon(prefixIcon, color: colors.onSurface.withValues(alpha: 0.5)),
+        suffixIcon: suffixIcon,
+        filled: true,
+        fillColor: colors.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        // Border normal
+        enabledBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide(color: colors.onSurface.withValues(alpha: 0.15)),
+        ),
+        // Border saat fokus
+        focusedBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
+        // Border saat error — warna merah, tapi error text tetap di luar
+        errorBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide(color: Colors.red.shade400, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: borderRadius,
+          borderSide: BorderSide(color: Colors.red.shade400, width: 2),
+        ),
+        errorStyle: const TextStyle(fontSize: 11, height: 1.3),
+      );
+    }
+
     return Scaffold(
       backgroundColor: colors.surface,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 48),
-              Center(
-                child: Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20)
-                    ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48),
+                Center(
+                  child: Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                        )
+                      ],
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(
+                      'lib/components/logo_siagakita.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (ctx, err, stack) =>
+                          Icon(Icons.shield, size: 60, color: primaryColor),
+                    ),
                   ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Image.asset(
-                    'lib/components/logo_siagakita.jpg',
-                    fit: BoxFit.cover,
-                    errorBuilder: (ctx, err, stack) => Icon(Icons.shield, size: 60, color: primaryColor),
+                ),
+                const SizedBox(height: 32),
+                Text(
+                  'Selamat Datang'.tr(context),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colors.onSurface,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
                   ),
                 ),
-              ),
-              const SizedBox(height: 32),
-              Text(
-                'Selamat Datang'.tr(context),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colors.onSurface,
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
+                const SizedBox(height: 8),
+                Text(
+                  'Masuk untuk mengakses sistem pelaporan darurat dan jejaring relawan.'
+                      .tr(context),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: colors.onSurface.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Masuk untuk mengakses sistem pelaporan darurat dan jejaring relawan.'.tr(context),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: colors.onSurface.withValues(alpha: 0.6),
-                  fontSize: 14,
-                ),
-              ),
-              const SizedBox(height: 48),
-              
-              // Email
-              Container(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: colors.onSurface.withValues(alpha: 0.1)),
-                ),
-                child: TextField(
+                const SizedBox(height: 48),
+
+                // ── Email ──────────────────────────────────────────────────
+                TextFormField(
                   controller: _emailController,
+                  keyboardType: TextInputType.emailAddress,
                   style: TextStyle(color: colors.onSurface),
-                  decoration: InputDecoration(
-                    hintText: 'Email Anda'.tr(context),
-                    hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
-                    prefixIcon: Icon(Icons.email_outlined, color: colors.onSurface.withValues(alpha: 0.5)),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  validator: _validateEmail,
+                  decoration: fieldDecoration(
+                    hint: 'Email Anda'.tr(context),
+                    prefixIcon: Icons.email_outlined,
                   ),
                 ),
-              ),
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Password
-              Container(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: colors.onSurface.withValues(alpha: 0.1)),
-                ),
-                child: TextField(
+                // ── Password ───────────────────────────────────────────────
+                TextFormField(
                   controller: _passwordController,
-                  obscureText: true,
+                  obscureText: _obscurePassword,
                   style: TextStyle(color: colors.onSurface),
-                  decoration: InputDecoration(
-                    hintText: 'Kata Sandi'.tr(context),
-                    hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
-                    prefixIcon: Icon(Icons.lock_outline, color: colors.onSurface.withValues(alpha: 0.5)),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  validator: _validatePassword,
+                  decoration: fieldDecoration(
+                    hint: 'Kata Sandi'.tr(context),
+                    prefixIcon: Icons.lock_outline,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: colors.onSurface.withValues(alpha: 0.4),
+                        size: 20,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    ),
                   ),
                 ),
-              ),
-              
-              const SizedBox(height: 16),
-              
-              // Mock Role Selector (Dev mode)
-              Container(
-                decoration: BoxDecoration(
-                  color: colors.surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton<String>(
-                    value: _selectedMockRole,
-                    isExpanded: true,
-                    icon: Icon(Icons.developer_mode, color: primaryColor),
-                    items: _mockRoles
-                        .map((role) => DropdownMenuItem(
-                            value: role,
-                            child: Text('${'Login sebagai'.tr(context)}: ${role.tr(context)}',
-                                style: TextStyle(color: colors.onSurface, fontWeight: FontWeight.bold, fontSize: 14))))
-                        .toList(),
-                    onChanged: (val) {
-                      setState(() => _selectedMockRole = val!);
-                    },
-                  ),
-                ),
-              ),
-              
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: Text('Lupa sandi?'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
-                ),
-              ),
-              
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _login,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  elevation: 5,
-                  shadowColor: primaryColor.withValues(alpha: 0.5),
-                ),
-                child: Text('Masuk'.tr(context), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 24),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Belum punya akun?'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.6))),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                      );
-                    },
-                    child: Text('Daftar di sini'.tr(context), style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold)),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Lupa sandi?'.tr(context),
+                      style: TextStyle(
+                          color: primaryColor, fontWeight: FontWeight.bold),
+                    ),
                   ),
-                ],
-              ),
-            ],
+                ),
+
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: _isLoading ? null : _login,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                    elevation: 5,
+                    shadowColor: primaryColor.withValues(alpha: 0.5),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'Masuk'.tr(context),
+                          style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                ),
+                const SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Belum punya akun?'.tr(context),
+                      style: TextStyle(
+                          color: colors.onSurface.withValues(alpha: 0.6)),
+                    ),
+                    TextButton(
+                      onPressed: _goToRegister,
+                      child: Text(
+                        'Daftar di sini'.tr(context),
+                        style: TextStyle(
+                            color: primaryColor, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),

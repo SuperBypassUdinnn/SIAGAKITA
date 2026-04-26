@@ -177,7 +177,7 @@ class _RelawanMainScreenState extends State<RelawanMainScreen> {
                       ),
                       Switch(
                         value: user.isAvailableForMission,
-                        activeColor: Colors.green,
+                        activeThumbColor: Colors.green,
                         inactiveThumbColor: Colors.red,
                         onChanged: _toggleAvailability,
                       )

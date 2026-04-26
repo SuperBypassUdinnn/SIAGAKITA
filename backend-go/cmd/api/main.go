@@ -10,6 +10,7 @@ import (
 	"siagakita-backend/internal/config"
 	"siagakita-backend/internal/database"
 	incidentDomain "siagakita-backend/internal/domain/incident"
+	otpDomain "siagakita-backend/internal/domain/otp"
 	"siagakita-backend/internal/domain/telemetry"
 	userDomain "siagakita-backend/internal/domain/user"
 	"siagakita-backend/internal/hub"
@@ -47,6 +48,11 @@ func main() {
 	incidentSvc := incidentDomain.NewService(incidentRepo)
 	incidentHandler := incidentDomain.NewHandler(incidentSvc)
 
+	// OTP domain
+	fonnteGateway := otpDomain.NewFonnteGateway(cfg.FonnteToken)
+	otpSvc := otpDomain.NewService(rdb, fonnteGateway)
+	otpHandler := otpDomain.NewHandler(otpSvc)
+
 	// Telemetry domain
 	telemetryHandler := telemetry.NewHandler(rdb, wsHub, cfg)
 
@@ -77,6 +83,8 @@ func main() {
 	auth := v1.Group("/auth")
 	auth.Post("/register", userHandler.Register)
 	auth.Post("/login", userHandler.Login)
+	auth.Post("/request-otp", otpHandler.RequestOTP)
+	auth.Post("/verify-otp", otpHandler.VerifyOTP)
 
 	// Users (protected)
 	authMw := middleware.Auth(cfg)

@@ -141,7 +141,7 @@ class _VolunteerRegistrationScreenState extends State<VolunteerRegistrationScree
               Text('PILIHAN SPESIALISASI'.tr(context), style: TextStyle(color: primaryTextColor, fontWeight: FontWeight.bold, letterSpacing: 1)),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedSpecialization,
+                initialValue: _selectedSpecialization,
                 decoration: InputDecoration(
                   labelText: 'Keahlian Relawan'.tr(context),
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

@@ -213,7 +213,7 @@ class _BiodataScreenState extends State<BiodataScreen> {
         border: Border.all(color: colors.onSurface.withValues(alpha: 0.1)),
       ),
       child: DropdownButtonFormField<String>(
-        value: controller.text.isNotEmpty ? controller.text : null,
+        initialValue: controller.text.isNotEmpty ? controller.text : null,
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4), fontSize: 12),

@@ -89,7 +89,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             initialDate = DateTime(int.parse(parts[2]), int.parse(parts[1]), int.parse(parts[0]));
           }
         }
-      } catch (e) {}
+      } catch (e) {
+        debugPrint('Date parse error: $e');
+      }
     }
 
     final DateTime? picked = await showDatePicker(
@@ -261,7 +263,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   children: [
                     DropdownButtonFormField<String>(
-                      value: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Belum Tahu'].contains(_bloodTypeCtrl.text) 
+                      initialValue: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'Belum Tahu'].contains(_bloodTypeCtrl.text) 
                             ? _bloodTypeCtrl.text 
                             : null,
                       decoration: InputDecoration(

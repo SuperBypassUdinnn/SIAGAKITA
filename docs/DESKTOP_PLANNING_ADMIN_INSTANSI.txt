@@ -1,0 +1,26 @@
+===========================================================================
+  SIAGAKITA — PERENCANAAN FRONTEND DESKTOP (Admin & Instansi)
+  Branch: frontend_desktop
+===========================================================================
+
+CATATAN:
+  Halaman Admin dan Instansi diputuskan untuk memiliki fokus antarmuka 
+  Desktop/Web (Dashboard Luas) daripada mobile. Branch ini digunakan 
+  khusus untuk pengembangan modul tersebut.
+
+1. TARGET MODUL:
+   - Admin Panel (Verifikasi relawan, statistik nasional, manajemen user).
+   - Instansi Dashboard (Monitor SOS masuk, dispatch tim, manajemen laporan).
+
+2. TEKNOLOGI:
+   - Flutter Desktop (macOS/Windows/Web).
+   - Responsive Layout (Sidebar + Header + Content Area).
+
+3. FITUR KRITIS DESKTOP:
+   - Real-time Map Dashboard (melihat semua laporan masuk di peta luas).
+   - Sistem Notifikasi Suara (Alat bantu petugas saat ada SOS).
+   - Tabel Data Kompleks (Data relawan, sertifikasi, riwayat penanganan).
+
+===========================================================================
+  Diperbarui: 26 April 2026
+===========================================================================
