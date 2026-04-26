@@ -27,6 +27,9 @@ type Config struct {
 	// SMS Gateway
 	SMSGatewaySecret string
 
+	// WhatsApp Gateway (Fonnte)
+	FonnteToken string
+
 	// Server
 	HTTPPort string
 	WSPort   string
@@ -57,6 +60,7 @@ func Load() *Config {
 		JWTAccessTTL:     accessTTL,
 		JWTRefreshTTL:    refreshTTL,
 		SMSGatewaySecret: getEnv("SMS_GATEWAY_SECRET", ""),
+		FonnteToken:      getEnv("FONNTE_TOKEN", ""),
 		HTTPPort:         getEnv("HTTP_PORT", "8080"),
 		WSPort:           getEnv("WS_PORT", "8081"),
 	}

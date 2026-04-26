@@ -60,7 +60,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   title: Text('Notifikasi Push (Aplikasi)'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   subtitle: Text('Peringatan darurat via aplikasi'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
-                  activeColor: Colors.orange,
+                  activeThumbColor: Colors.orange,
                   value: _pushNotifications,
                   onChanged: (val) => setState(() => _pushNotifications = val),
                 ),
@@ -68,7 +68,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   title: Text('Lansiran SMS'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   subtitle: Text('Kirim pesan SMS jika tidak ada koneksi internet'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
-                  activeColor: Colors.orange,
+                  activeThumbColor: Colors.orange,
                   value: _smsAlerts,
                   onChanged: (val) => setState(() => _smsAlerts = val),
                 ),
@@ -92,7 +92,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 SwitchListTile(
                   title: Text('Akses Lokasi Latar Belakang'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
                   subtitle: Text('Sangat disarankan untuk evakuasi cepat'.tr(context), style: TextStyle(color: colors.onSurface.withValues(alpha: 0.5), fontSize: 12)),
-                  activeColor: Colors.orange,
+                  activeThumbColor: Colors.orange,
                   value: _locationTracking,
                   onChanged: (val) => setState(() => _locationTracking = val),
                 ),
@@ -121,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               children: [
                 SwitchListTile(
                   title: Text('Mode Gelap (Dark Mode)'.tr(context), style: TextStyle(color: secondaryTextColor, fontWeight: FontWeight.w600)),
-                  activeColor: Colors.orange,
+                  activeThumbColor: Colors.orange,
                   value: _darkMode,
                   onChanged: (val) {
                     setState(() => _darkMode = val);

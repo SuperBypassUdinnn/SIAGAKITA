@@ -39,7 +39,7 @@ class _SiagaKitaAppState extends State<SiagaKitaApp> {
       builder: (_, ThemeMode currentMode, child) {
         return ValueListenableBuilder<Locale>(
           valueListenable: SiagaKitaApp.localeNotifier,
-          builder: (_, Locale currentLocale, __) {
+          builder: (_, Locale currentLocale, w) {
             return MaterialApp(
               title: 'SiagaKita',
               debugShowCheckedModeBanner: false,
