@@ -7,7 +7,14 @@ import 'profile_screen.dart';
 import '../relawan/relawan_main_screen.dart';
 import '../../core/models/user_model.dart';
 class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+  final String accessToken;
+  final String userId;
+
+  const MainScreen({
+    super.key,
+    required this.accessToken,
+    required this.userId,
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -24,7 +31,7 @@ class _MainScreenState extends State<MainScreen> {
         final isRelawan = user.volunteerStatus == 'approved' || user.role == UserRole.relawan;
         
         final List<Widget> screens = [
-          const HomeScreen(),
+          HomeScreen(accessToken: widget.accessToken, userId: widget.userId),
           const GuideScreen(),
           if (isRelawan) const RelawanMainScreen(),
           const MapScreen(),

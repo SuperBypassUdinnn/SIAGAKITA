@@ -16,29 +16,50 @@ func NewHandler(svc *Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-// Register handles POST /api/v1/auth/register
+// ─── POST /api/v1/auth/register ───────────────────────────────────────────────
+// Step 1: buat akun → OTP dikirim ke email → return {message, email}
 func (h *Handler) Register(c *fiber.Ctx) error {
 	var req RegisterRequest
 	if err := c.BodyParser(&req); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
 	}
 
-	resp, err := h.svc.Register(&req)
+	result, err := h.svc.Register(c.Context(), &req)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	return utils.CreatedResponse(c, resp)
+	return utils.CreatedResponse(c, result)
 }
 
-// Login handles POST /api/v1/auth/login
+// ─── POST /api/v1/auth/verify-register-otp ───────────────────────────────────
+// Step 2: verifikasi OTP email → return JWT
+func (h *Handler) VerifyRegisterOTP(c *fiber.Ctx) error {
+	var req VerifyEmailOTPRequest
+	if err := c.BodyParser(&req); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
+	}
+	if req.Email == "" || req.OTPCode == "" {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "email dan otp_code wajib diisi")
+	}
+
+	resp, err := h.svc.VerifyRegisterOTP(c.Context(), req.Email, req.OTPCode)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	return utils.SuccessResponse(c, resp)
+}
+
+// ─── POST /api/v1/auth/login ──────────────────────────────────────────────────
+// Validasi email+password → langsung return JWT (tanpa langkah OTP)
 func (h *Handler) Login(c *fiber.Ctx) error {
 	var req LoginRequest
 	if err := c.BodyParser(&req); err != nil {
 		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
 	}
 
-	resp, err := h.svc.Login(&req)
+	resp, err := h.svc.Login(c.Context(), &req)
 	if err != nil {
 		return utils.ErrorResponse(c, fiber.StatusUnauthorized, err.Error())
 	}
@@ -46,7 +67,26 @@ func (h *Handler) Login(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, resp)
 }
 
-// SaveBiodata handles POST /api/v1/users/biodata  [Auth required]
+// ─── POST /api/v1/auth/verify-login-otp ──────────────────────────────────────
+// Step 2: verifikasi OTP email → return JWT
+func (h *Handler) VerifyLoginOTP(c *fiber.Ctx) error {
+	var req VerifyEmailOTPRequest
+	if err := c.BodyParser(&req); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
+	}
+	if req.Email == "" || req.OTPCode == "" {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "email dan otp_code wajib diisi")
+	}
+
+	resp, err := h.svc.VerifyLoginOTP(c.Context(), req.Email, req.OTPCode)
+	if err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	return utils.SuccessResponse(c, resp)
+}
+
+// ─── POST /api/v1/users/biodata  [Auth required] ─────────────────────────────
 func (h *Handler) SaveBiodata(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(string)
 
@@ -62,7 +102,7 @@ func (h *Handler) SaveBiodata(c *fiber.Ctx) error {
 	return utils.SuccessResponse(c, fiber.Map{"message": "Biodata berhasil disimpan"})
 }
 
-// GetProfile handles GET /api/v1/users/profile  [Auth required]
+// ─── GET /api/v1/users/profile  [Auth required] ──────────────────────────────
 func (h *Handler) GetProfile(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(string)
 
@@ -72,4 +112,50 @@ func (h *Handler) GetProfile(c *fiber.Ctx) error {
 	}
 
 	return utils.SuccessResponse(c, profile)
+}
+
+// ─── POST /api/v1/users/phone/request-otp  [Auth required] ───────────────────
+func (h *Handler) RequestPhoneVerification(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+
+	var req PhoneUpdateRequest
+	if err := c.BodyParser(&req); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
+	}
+	if req.PhoneNumber == "" {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "phone_number wajib diisi")
+	}
+
+	if err := h.svc.RequestPhoneVerification(c.Context(), userID, req.PhoneNumber); err != nil {
+		if err.Error() == "Tunggu 1 menit sebelum meminta kode baru" {
+			return utils.ErrorResponse(c, fiber.StatusTooManyRequests, err.Error())
+		}
+		return utils.ErrorResponse(c, fiber.StatusInternalServerError, err.Error())
+	}
+
+	return utils.SuccessResponse(c, fiber.Map{
+		"message": "Kode OTP telah dikirimkan ke WhatsApp Anda. Berlaku 3 menit.",
+	})
+}
+
+// ─── POST /api/v1/users/phone/verify-otp  [Auth required] ───────────────────
+func (h *Handler) ConfirmPhoneOTP(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+
+	var req VerifyPhoneRequest
+	if err := c.BodyParser(&req); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "Body request tidak valid")
+	}
+	if req.PhoneNumber == "" || req.OTPCode == "" {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, "phone_number dan otp_code wajib diisi")
+	}
+
+	if err := h.svc.ConfirmPhoneOTP(c.Context(), userID, req.PhoneNumber, req.OTPCode); err != nil {
+		return utils.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	return utils.SuccessResponse(c, fiber.Map{
+		"message":  "Nomor HP berhasil diverifikasi.",
+		"verified": true,
+	})
 }

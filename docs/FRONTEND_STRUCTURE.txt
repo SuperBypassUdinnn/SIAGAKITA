@@ -1,13 +1,13 @@
 ===========================================================================
   SIAGAKITA — DOKUMENTASI STRUKTUR FRONTEND (Flutter)
-  Untuk referensi tim Backend
-  Diperbarui: 25 April 2026
+  Untuk referensi tim Backend & anggota baru
+  Diperbarui: 29 April 2026
 ===========================================================================
 
 CATATAN PENTING:
-  Semua kode frontend saat ini masih menggunakan DATA MOCK / SIMULASI.
-  Belum ada koneksi HTTP nyata ke backend. Dokumentasi ini menjelaskan
-  apa yang DIBUTUHKAN frontend dari backend agar integrasi bisa dilakukan.
+  Integrasi API sudah aktif pada modul Auth dan SOS.
+  Modul lain (Profile, Biodata, Map, Relawan) masih menggunakan data MOCK.
+  Dokumentasi ini menjelaskan state terkini dan kebutuhan integrasi berikutnya.
 
 ===========================================================================
 1. STRUKTUR FOLDER (mobile-flutter/lib/)
@@ -22,64 +22,76 @@ lib/
 │   ├── localization/
 │   │   └── app_localization.dart     — Kamus terjemahan ID→EN + extension .tr(context)
 │   ├── widgets/
-│   │   └── role_placeholder.dart     — Widget placeholder shared (relawan, instansi, admin)
-│   └── router.dart                   — AppRouter: routing berdasarkan role setelah login
+│   │   └── role_placeholder.dart     — Widget placeholder shared
+│   ├── services/
+│   │   ├── auth_service.dart         ★ BARU — API client auth (register, OTP, login)
+│   │   ├── incident_service.dart     ★ BARU — API client SOS (trigger, cancel, location)
+│   │   ├── location_service.dart     ★ BARU — GPS wrapper (permission, get position)
+│   │   └── otp_service.dart          — WA OTP client (dipakai di phone verification)
+│   └── router.dart                   — AppRouter: routing berdasarkan role + token
 │
 ├── features/
 │   ├── auth/
-│   │   ├── login_screen.dart         — Halaman Login (email + password)
-│   │   ├── register_screen.dart      — Halaman Registrasi (4 langkah)
-│   │   └── biodata_screen.dart       — Halaman Pengisian Biodata Kesehatan
+│   │   ├── login_screen.dart         — Login single-step (Email+Password → JWT)
+│   │   ├── register_screen.dart      — Register 2-step (Form → Email OTP)
+│   │   └── biodata_screen.dart       — Biodata kesehatan (menerima accessToken/userId)
 │   │
-│   ├── masyarakat/                   — Fitur utama role Masyarakat Umum
-│   │   ├── main_screen.dart          — Navigasi utama (Bottom Nav: Beranda/Panduan/Map/Profil)
-│   │   ├── home_screen.dart          — Tombol SOS + shortcut Laporkan & Edukasi
-│   │   ├── guide_screen.dart         — Panduan Pertolongan Pertama (lokal/offline)
-│   │   ├── map_screen.dart           — Radar & peta sebaran relawan + titik kumpul
-│   │   ├── profile_screen.dart       — Profil pengguna + data kesehatan (biometric ledger)
-│   │   ├── edit_profile_screen.dart  — Form penyuntingan biodata & profil
-│   │   ├── settings_screen.dart      — Pengaturan notifikasi, privasi, mode gelap, & bahasa
-│   │   ├── about_screen.dart         — Informasi versi aplikasi & lisensi
-│   │   └── report_screen.dart        — Form pelaporan kejadian darurat
+│   ├── masyarakat/                   — Fitur role Masyarakat & Relawan
+│   │   ├── main_screen.dart          — Navigasi utama (Bottom Nav), menerima token
+│   │   ├── home_screen.dart          — Tombol SOS + GPS tracking + cancel SOS
+│   │   ├── guide_screen.dart         — Panduan Pertolongan Pertama (offline)
+│   │   ├── map_screen.dart           — Radar peta (MOCK)
+│   │   ├── profile_screen.dart       — Profil pengguna (MOCK)
+│   │   ├── edit_profile_screen.dart  — Form edit biodata & profil (MOCK)
+│   │   ├── settings_screen.dart      — Notifikasi, privasi, mode gelap, bahasa
+│   │   ├── about_screen.dart         — Informasi aplikasi (statis)
+│   │   ├── report_screen.dart        — Form laporan darurat (MOCK)
+│   │   └── volunteer_registration_screen.dart — Daftar jadi relawan (MOCK)
 │   │
 │   ├── relawan/
-│   │   └── relawan_main_screen.dart  — Tactical Dashboard (On Duty Toggle, Radar Misi, Poin/Level)
+│   │   └── relawan_main_screen.dart  — Tactical Dashboard (MOCK)
 │   │
 │   ├── instansi/
-│   │   └── instansi_main_screen.dart — [PLACEHOLDER] Tab: Dashboard, Laporan, Tim, Profil
+│   │   └── instansi_main_screen.dart — [PLACEHOLDER]
 │   │
 │   └── admin/
-│       └── admin_main_screen.dart    — [PLACEHOLDER] Tab: Statistik, User, Laporan, Setting
+│       └── admin_main_screen.dart    — [PLACEHOLDER]
 │
 └── components/
-    └── logo_siagakita.jpg            — Aset logo (dipakai di login screen)
+    └── logo_siagakita.jpg            — Aset logo
 
 ===========================================================================
 2. ROLE PENGGUNA
 ===========================================================================
 
-Terdapat 4 role yang didefinisikan di core/models/user_model.dart:
+4 role yang didefinisikan di core/models/user_model.dart:
 
-  Role Enum     | Label Indonesia       | Warna Badge
-  --------------|----------------------|-------------
-  masyarakat    | Masyarakat Umum      | #18A3FF (Biru)
-  relawan       | Relawan              | #22C55E (Hijau)
-  instansi      | Instansi Penyelamat  | #FF7418 (Oranye)
-  admin         | Administrator        | #A855F7 (Ungu)
+  Role Enum (Flutter) | DB Enum (Go)      | Label Indonesia       | Warna Badge
+  --------------------|-------------------|----------------------|-------------
+  masyarakat          | civilian          | Masyarakat Umum      | #18A3FF (Biru)
+  relawan             | volunteer         | Relawan              | #22C55E (Hijau)
+  instansi            | agency_responder  | Instansi Penyelamat  | #FF7418 (Oranye)
+  admin               | admin             | Administrator        | #A855F7 (Ungu)
 
-Model UserModel yang diharapkan dari response API login:
+PENTING:
+  - Role TIDAK dipilih user saat daftar. Backend menentukan berdasarkan akun.
+  - Role masyarakat & relawan ada di Mobile Flutter.
+  - Role instansi & admin ada di Desktop Flutter (Windows).
+
+Response API login setelah integrasi:
   {
-    "id":           "string",    — ID unik pengguna
-    "name":         "string",    — Nama lengkap
-    "email":        "string",    — Email
-    "role":         "string",    — Salah satu: "masyarakat" | "relawan" | "instansi" | "admin"
-    "phone_number": "string",    — Nomor telepon utama
-    "birth_date":   "string",    — Tanggal lahir (DD-MM-YYYY)
-    "bio":          "string"     — Bio singkat pengguna
+    "access_token":  "string",   — JWT untuk akses endpoint protected
+    "refresh_token": "string",   — JWT untuk refresh session
+    "user": {
+      "id":                   "string",   — UUID pengguna
+      "full_name":            "string",   — Nama lengkap
+      "email":                "string",   — Email
+      "role":                 "string",   — "civilian"|"volunteer"|"agency_responder"|"admin"
+      "is_email_verified":    bool,       — Apakah email sudah terverifikasi
+      "is_phone_verified":    bool,       — Apakah nomor HP sudah terverifikasi
+      "is_verified_volunteer": bool       — Apakah sudah verifikasi jadi relawan
+    }
   }
-
-Setelah login, frontend akan memanggil AppRouter.getHomeByRole(role)
-untuk menavigasi ke halaman yang sesuai.
 
 ===========================================================================
 3. ALUR NAVIGASI (Screen Flow)
@@ -88,447 +100,360 @@ untuk menavigasi ke halaman yang sesuai.
   [App Launch]
        │
        ▼
-  LoginScreen  ──────────────────────────────────────────┐
-       │  (Masuk)                                         │ (Daftar di sini)
-       │  → MOCK: langsung ke MainScreen masyarakat      │
-       │    NANTI: cek role dari response API             ▼
-       │                                           RegisterScreen (4 langkah)
-       │                                                  │ Step 0: Form data diri
-       │                                                  │ Step 1: OTP verifikasi HP
-       │                                                  │ Step 2: Foto KTP
-       │                                                  │ Step 3: Foto wajah (selfie)
-       │                                                  │
-       │                                                  ▼
-       │                                           BiodataScreen
-       │                                                  │ - Golongan darah, BB, TB
-       │                                                  │ - Riwayat medis & alergi
-       │                                                  │ - Alamat lengkap
-       │                                                  │ - Kontak darurat
-       │                                                  ▼
-       │                                           LoginScreen (redirect setelah simpan)
+  LoginScreen
+       │  → Email + Password → POST /auth/login → JWT langsung
+       │  → GPS Permission diminta
+       │  → HomeScreen (via MainScreen, bawa accessToken + userId)
        │
+       │  (Daftar di sini)
        ▼
-  [Berdasarkan role dari API]
-       ├── masyarakat → MainScreen (Beranda/Panduan/Map/Profil)
-       ├── relawan    → MainScreen (Inject Extra Tab "Operasi" → RelawanMainScreen)
-       ├── instansi   → InstansiMainScreen [PLACEHOLDER]
-       └── admin      → AdminMainScreen    [PLACEHOLDER]
+  RegisterScreen — 2 Langkah
+    Step 0: Nama + Email + Password (dengan strength bar)
+            → POST /auth/register → Kirim OTP ke email
+    Step 1: Input OTP 6 digit (resend cooldown 60s)
+            → POST /auth/verify-register-otp → JWT
+            → GPS Permission diminta
+            ↓
+       BiodataScreen (menerima accessToken + userId)
+         - Golongan darah, BB, TB, riwayat medis, alergi
+         - Alamat, kontak darurat
+         ↓
+  MainScreen (bawa accessToken + userId)
+
+  [Berdasarkan role dari JWT]
+    ├── civilian/volunteer → MainScreen (Beranda/Panduan/Map/Profil)
+    │     └── HomeScreen (dengan GPS tracking SOS)
+    ├── agency_responder   → InstansiMainScreen [PLACEHOLDER]
+    └── admin              → AdminMainScreen [PLACEHOLDER]
+
+  [Verifikasi Nomor HP — dalam ProfileScreen, setelah login]
+    Isi nomor HP → POST /users/phone/request-otp → OTP via WhatsApp
+    Input OTP → POST /users/phone/verify-otp → is_phone_verified = true
 
 ===========================================================================
-4. DETAIL TIAP SCREEN & KEBUTUHAN API
+4. DETAIL TIAP SCREEN & STATE INTEGRASI
 ===========================================================================
 
-─────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────
 4.1 LOGIN SCREEN (features/auth/login_screen.dart)
-─────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────
+  Status: ✅ TERHUBUNG KE API
+
   Input dari user:
-    - email    : String
-    - password : String (obscured)
+    - email    : String (validasi format regex)
+    - password : String (wajib isi)
 
-  Tombol aksi:
-    - "Masuk"      → kirim ke API login
-    - "Lupa sandi" → (belum diimplementasi)
-    - "Daftar"     → ke RegisterScreen
+  Flow:
+    1. Validasi form lokal
+    2. POST /auth/login → return JWT langsung
+    3. LocationService.requestPermission() — minta izin GPS
+    4. Navigate ke HomeScreen dengan accessToken + userId
 
-  API yang DIBUTUHKAN:
-    POST /api/auth/login
+  API yang DIGUNAKAN:
+    POST /api/v1/auth/login
     Body:  { "email": "...", "password": "..." }
-    Response sukses:
+    Response sukses (200):
       {
-        "token": "Bearer <jwt>",
-        "user": {
-          "id":    "string",
-          "name":  "string",
-          "email": "string",
-          "role":  "masyarakat" | "relawan" | "instansi" | "admin",
-          "volunteer_status": "none" | "pending" | "approved"
-        }
+        "access_token": "eyJ...",
+        "refresh_token": "eyJ...",
+        "user": { "id": "...", "full_name": "...", "email": "...", "role": "civilian", ... }
       }
-    Response gagal: { "message": "Email atau password salah" }
-
-  *NOTE DEV: Saat ini terdapat "Mock Role Selector" (Dropdown) di 
-  LoginScreen untuk testing loncat antar role UI tanpa backend riil.
+    Response gagal: { "message": "email atau password salah" }
 
 ─────────────────────────────────────────────────────────────
 4.2 REGISTER SCREEN (features/auth/register_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Proses registrasi dibagi 4 langkah (stepper):
+  Status: ✅ TERHUBUNG KE API
 
-  STEP 0 — Form Data Diri:
-    Field yang dikumpulkan:
-      - username        : String
-      - name_ktp        : String (Nama sesuai KTP)
-      - ktp_number      : String (Nomor KTP / NIK, numerik)
-      - phone           : String (Nomor telepon)
-      - email           : String
-      - password        : String
-      - repeat_password : String
+  STEP 0 — Form Data Akun:
+    Field:
+      - full_name       : String (wajib, tidak boleh kosong)
+      - email           : String (validasi regex)
+      - password        : String (min 8 karakter + huruf besar + angka + simbol)
+      - repeat_password : String (harus cocok)
+    Password Strength Bar — 3 segmen animasi:
+      🔴 Merah  = Lemah  (1 syarat terpenuhi)
+      🟠 Oranye = Sedang (2 syarat terpenuhi)
+      🟢 Hijau  = Kuat ✓ (semua syarat terpenuhi)
+    Resend OTP countdown: 60 detik setelah request pertama
 
-    API: POST /api/auth/register (kirim setelah step 3 selesai)
+  API yang DIGUNAKAN:
+    POST /api/v1/auth/register
+    Body: { "full_name": "...", "email": "...", "password": "..." }
+    Response: { "message": "OTP dikirim ke email", "email": "..." }
+    *Jika SMTP gagal: akun dirollback (hard delete), email bisa dipakai ulang*
 
-  STEP 1 — Verifikasi OTP:
-    - OTP dikirimkan ke nomor telepon yang didaftarkan
-    - Input: kode OTP (numerik)
-    - Ada tombol "Kirim ulang OTP"
+  STEP 1 — Verifikasi Email OTP:
+    - OTP 6 digit dikirimkan ke email yang didaftarkan
+    - Input: kode OTP numerik
+    - Tombol "Kirim ulang" (disabled selama cooldown 60 detik)
 
-    API yang DIBUTUHKAN:
-      POST /api/auth/send-otp   → { "phone": "..." }
-      POST /api/auth/verify-otp → { "phone": "...", "otp": "123456" }
+  API yang DIGUNAKAN:
+    POST /api/v1/auth/verify-register-otp
+    Body: { "email": "...", "otp_code": "123456" }
+    Response: { "access_token": "...", "refresh_token": "...", "user": {...} }
 
-  STEP 2 — Foto KTP:
-    - Ambil foto KTP menggunakan kamera
-    - Upload file gambar ke backend untuk verifikasi biometrik
-
-    API yang DIBUTUHKAN:
-      POST /api/auth/upload-ktp
-      Content-Type: multipart/form-data
-      Body: { "ktp_photo": <file> }
-
-  STEP 3 — Foto Wajah (Selfie):
-    - Ambil selfie untuk pencocokan wajah dengan foto KTP
-
-    API yang DIBUTUHKAN:
-      POST /api/auth/upload-selfie
-      Content-Type: multipart/form-data
-      Body: { "face_photo": <file> }
+  CATATAN: Nomor HP TIDAK dikumpulkan saat register.
+  HP dikumpulkan + diverifikasi di halaman Profile/Biodata.
 
 ─────────────────────────────────────────────────────────────
 4.3 BIODATA SCREEN (features/auth/biodata_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Diisi SETELAH registrasi selesai. Data ini penting untuk
-  penanganan medis darurat.
+  Status: 🟡 UI SELESAI — API BELUM TERHUBUNG
+  Props: accessToken (String), userId (String)
 
   Field yang dikumpulkan:
     - birth_date              : String (Format: DD-MM-YYYY)
-    - blood_type              : String (Dropdown: "A+", "B-", dll)
-    - weight                  : String/Num (Berat badan, kg)
-    - height                  : String/Num (Tinggi badan, cm)
-    - medical_history         : String (riwayat penyakit)
-    - allergies               : String (daftar alergi)
-    - address                 : String (alamat domisili lengkap)
-    - emergency_contact_name  : String (nama wali/keluarga)
-    - emergency_contact_phone : String (nomor telepon darurat)
+    - blood_type              : String (Dropdown)
+    - weight                  : Int (kg)
+    - height                  : Int (cm)
+    - medical_history         : String
+    - allergies               : String
+    - address                 : String
+    - emergency_contact_name  : String
+    - emergency_contact_phone : String
+    - emergency_relation      : String
 
   API yang DIBUTUHKAN:
-    POST /api/user/biodata
+    POST /api/v1/users/biodata
     Headers: Authorization: Bearer <token>
     Body: {
-      "birth_date": "20-05-1998",
-      "blood_type": "O+",
-      "weight": "70",
-      "height": "175",
-      "medical_history": "Asma Ringan",
-      "allergies": "Penisilin, Kacang",
-      "address": "Jl. ...",
-      "emergency_contact_name": "Siti Aminah",
-      "emergency_contact_phone": "0812-3456-7890"
+      "date_of_birth":         "20-05-1998",
+      "blood_type":            "O+",
+      "weight_kg":             70,
+      "height_cm":             175,
+      "medical_conditions":    "Asma Ringan",
+      "allergies":             "Penisilin",
+      "alamat":                "Jl. ...",
+      "emergency_contact_name":  "Siti Aminah",
+      "emergency_contact_phone": "0812-3456-7890",
+      "emergency_relation":      "Ibu / Wali"
     }
 
 ─────────────────────────────────────────────────────────────
 4.4 HOME SCREEN — SOS BUTTON (features/masyarakat/home_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Fitur utama: Tombol SOS dengan hold selama 10 detik.
+  Status: ✅ TERHUBUNG KE API
+  Props: accessToken (String), userId (String)
 
-  Mekanisme:
-    1. User menekan dan menahan tombol bulat SOS
-    2. Progress circular mengisi selama 10 detik
-    3. Haptic feedback di setiap detik
-    4. Setelah 10 detik → _triggerSOS() dipanggil
-    5. Muncul banner "SINYAL SOS TERKIRIM!" selama 3 detik
+  Mekanisme SOS (kirim):
+    1. User ketuk tombol SOS 5× dalam 1.5 detik
+    2. Confirmation Dialog muncul dengan countdown 5 detik
+    3. Option A: User tekan "BATALKAN" → SOS dibatalkan (dialog tutup)
+    4. Option B: User tekan "KIRIM!" → SOS dikirim (trigger_method: 'user')
+    5. Option C: Countdown habis → SOS dikirim otomatis (trigger_method: 'timeout')
+    6. Banner slide-down "SINYAL SOS TERKIRIM!" muncul 4 detik
 
-  Yang dikirim ke API saat SOS terpicu:
-    - Koordinat GPS pengguna (latitude, longitude)
-    - ID pengguna (dari token)
-    - Timestamp
+  Mekanisme SOS (batalkan) — saat SOS aktif:
+    1. Tombol berubah merah, label "AKTIF" + "KETUK 5× BATALKAN"
+    2. User ketuk tombol 5× dalam 1.5 detik
+    3. Dialog konfirmasi hijau "BATALKAN SOS?" dengan countdown 5 detik
+    4. Jika konfirmasi: POST /incidents/:id/cancel → SOS dibatalkan
+    5. Jika timeout: dialog tutup, SOS tetap aktif
 
-  API yang DIBUTUHKAN:
-    POST /api/sos/trigger
-    Headers: Authorization: Bearer <token>
+  GPS Tracking:
+    - Saat app buka: GET /incidents/active → cek apakah ada SOS aktif
+    - Saat SOS aktif: Timer 1 menit → PUT /incidents/:id/location
+
+  API yang DIGUNAKAN:
+    GET  /api/v1/incidents/active
+    POST /api/v1/incidents/trigger
     Body: {
-      "latitude":  -5.4867,
-      "longitude": 95.3216,
-      "timestamp": "2026-04-22T00:00:00Z"
+      "latitude":       -5.4867,
+      "longitude":      95.3216,
+      "trigger_method": "user" | "timeout",
+      "incident_type":  null,       ← opsional
+      "address_detail": null        ← opsional
     }
-    Response: { "sos_id": "abc123", "message": "SOS diterima, bantuan dikirim" }
+    Response: { "incident_id": 1, "status": "broadcasting", "message": "..." }
 
-  Shortcut di bawah SOS button:
-    - "Laporkan"  → ke ReportScreen
-    - "Edukasi"   → ke GuideScreen (via bottom nav tab 2)
+    POST /api/v1/incidents/:id/cancel
+    Response: { "cancelled": true }
+
+    PUT  /api/v1/incidents/:id/location
+    Body: { "latitude": -5.4867, "longitude": 95.3216 }
 
 ─────────────────────────────────────────────────────────────
 4.5 REPORT SCREEN (features/masyarakat/report_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Form pelaporan kejadian darurat oleh masyarakat.
+  Status: 🟡 UI SELESAI — API BELUM TERHUBUNG
 
   Data yang dikumpulkan:
-    - location      : GPS otomatis (koordinat + nama jalan)
-    - category      : String — salah satu dari:
-                        "Kebakaran" | "Kecelakaan" | "Bencana Alam" |
-                        "Kriminalitas" | "Medis"
-    - photo         : File gambar (dari kamera)
-    - audio         : File audio (rekaman suara)
-    - description   : String (deskripsi tambahan, opsional)
-    - urgency_level : Integer — 0=Ringan, 1=Sedang, 2=Kritis
+    - location      : GPS otomatis
+    - category      : "Kebakaran"|"Kecelakaan"|"Bencana Alam"|"Kriminalitas"|"Medis"
+    - photo         : File gambar
+    - audio         : File audio
+    - description   : String (opsional)
+    - urgency_level : 0=Ringan, 1=Sedang, 2=Kritis
 
   API yang DIBUTUHKAN:
-    POST /api/report/create
-    Headers:
-      Authorization: Bearer <token>
-      Content-Type: multipart/form-data
-    Body: {
-      "latitude":     -5.4867,
-      "longitude":    95.3216,
-      "category":     "Kebakaran",
-      "description":  "Ada asap tebal dari gedung sebelah",
-      "urgency_level": 2,
-      "photo":        <file>,
-      "audio":        <file>
-    }
-    Response sukses: {
-      "report_id": "rpt-001",
-      "status":    "pending",
-      "message":   "Laporan berhasil dikirim"
-    }
+    POST /api/v1/report/create
+    Headers: Authorization: Bearer <token>, Content-Type: multipart/form-data
+    Body: { latitude, longitude, category, description, urgency_level, photo, audio }
 
 ─────────────────────────────────────────────────────────────
 4.6 MAP SCREEN (features/masyarakat/map_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Menampilkan radar area 5km dari lokasi pengguna.
-  Saat ini isinya STATIC/MOCK.
+  Status: 🔴 MOCK / STATIC — API BELUM DIINTEGRASIKAN
 
-  Data yang ditampilkan (akan diambil dari API):
-    - Lokasi relawan terdekat (nama, koordinat)
-    - Titik kumpul evakuasi terdekat
-    - Fasilitas kesehatan (klinik/RS) terdekat
-    - Status transmisi SOS
+  Menampilkan: relawan terdekat, titik kumpul, fasilitas kesehatan.
 
   API yang DIBUTUHKAN:
-    GET /api/map/nearby?lat=-5.4867&lng=95.3216&radius=5
+    GET /api/v1/map/nearby?lat=-5.4867&lng=95.3216&radius=5
     Headers: Authorization: Bearer <token>
-    Response: {
-      "relawan": [
-        { "id": "r1", "name": "Ahmad", "lat": -5.481, "lng": 95.319, "distance_km": 0.8 }
-      ],
-      "titik_kumpul": [
-        { "id": "tk1", "name": "Lapangan Desa", "lat": -5.483, "lng": 95.321 }
-      ],
-      "fasilitas_kesehatan": [
-        { "id": "fk1", "name": "Puskesmas Lhoknga", "lat": -5.490, "lng": 95.310, "type": "klinik" }
-      ]
-    }
 
 ─────────────────────────────────────────────────────────────
 4.7 PROFILE SCREEN (features/masyarakat/profile_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Menampilkan data profil pengguna. Saat ini data masih STATIS.
+  Status: 🟡 UI SELESAI — API BELUM TERHUBUNG
 
-  Data yang ditampilkan (Dinamis):
-    - Nama Lengkap + Kalkulasi Umur (Otomatis dari birth_date)
-    - ID SiagaKita
-    - Status Relawan (Badge)
-    - Email, Nomor Telepon, Bio
-    - Tanggal Lahir (DD-MM-YYYY)
-    - Golongan Darah, Berat & Tinggi
-    - Alergi, Riwayat Medis
-    - Alamat Lengkap
-    - Kontak Darurat (Nama + Nomor Telepon)
+  Yang perlu ditampilkan (termasuk field baru):
+    - Nama, email, role, tanggal lahir
+    - is_email_verified (✅/❌ badge)
+    - is_phone_verified (✅/❌ badge)
+    - Nomor HP (dengan tombol "Verifikasi via WA" jika belum verified)
+    - Data kesehatan (dari user_medical_profiles)
+    - Kontak darurat
 
   API yang DIBUTUHKAN:
-    GET /api/user/profile
+    GET /api/v1/users/profile
     Headers: Authorization: Bearer <token>
     Response: {
-      "id":                     "SK-2983-4412",
-      "name":                   "Budi Santoso",
-      "email":                  "budi@email.com",
-      "phone_number":           "0812-3456-7890",
-      "birth_date":             "20-05-1998",
-      "bio":                    "Pemerhati keamanan bencana...",
-      "role":                   "masyarakat",
-      "volunteer_status":       "approved",
+      "id":                "uuid",
+      "full_name":         "...",
+      "email":             "...",
+      "phone_number":      "..." | null,
+      "date_of_birth":     "DD-MM-YYYY" | null,
+      "role":              "civilian",
+      "is_email_verified": true,
+      "is_phone_verified": false,
+      "is_verified_volunteer": false,
       "medical_data": {
-        "blood_type":           "O+",
-        "weight":               "70",
-        "height":               "175",
-        "allergies":            "Penisilin, Kacang",
-        "medical_history":      "Asma Ringan",
-        "address":              "Jl. Cut Nyak Dhien No. 44, ..."
+        "blood_type": "O+", "allergies": "...", ...
       },
       "emergency_contacts": [
-        {
-          "name":  "Siti Aminah",
-          "phone": "0812-3456-7891",
-          "relation": "Ibu / Wali"
-        }
+        { "contact_name": "...", "contact_phone": "...", "relation": "..." }
       ]
     }
 
-  Tombol "Keluar dari Akun":
-    - Hapus token dari storage lokal
-    - Navigasi kembali ke LoginScreen
-
-    API yang DIBUTUHKAN (opsional):
-      POST /api/auth/logout
-      Headers: Authorization: Bearer <token>
+  Verifikasi nomor HP (dalam Profile):
+    POST /api/v1/users/phone/request-otp  ← { "phone_number": "08xxx" }
+    POST /api/v1/users/phone/verify-otp   ← { "phone_number": "08xxx", "otp_code": "123456" }
 
 ─────────────────────────────────────────────────────────────
 4.8 GUIDE SCREEN (features/masyarakat/guide_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Panduan pertolongan pertama.
-  Saat ini data STATIS/HARDCODED di frontend (bisa offline).
+  Status: ✅ SELESAI (data statis/offline)
 
-  Data panduan yang ada:
-    1. Pendarahan Hebat (tipe: MEDIS)
-    2. Luka Bakar        (tipe: MEDIS)
-    3. Tersedak Dewasa   (tipe: MEDIS)
-    4. Gempa Bumi        (tipe: BENCANA)
+  Panduan tersedia:
+    1. Pendarahan Hebat (MEDIS)
+    2. Luka Bakar (MEDIS)
+    3. Tersedak Dewasa (MEDIS)
+    4. Gempa Bumi (BENCANA)
 
-  Fitur:
-    - Pencarian realtime berdasarkan judul atau tipe
-    - Expand/collapse langkah-langkah panduan
-
-  API (opsional — untuk update konten dinamis):
-    GET /api/guides?type=MEDIS|BENCANA
-    Response: [
-      {
-        "id": 1,
-        "title": "Pendarahan Hebat",
-        "type": "MEDIS",
-        "steps": ["langkah 1", "langkah 2", ...]
-      }
-    ]
+  Fitur: pencarian realtime, expand/collapse langkah
 
 ─────────────────────────────────────────────────────────────
 4.9 RELAWAN TACTICAL SCREEN (features/relawan/relawan_main_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Tampil sebagai tab ekstra "Operasi" pada bottom navigation bar
-  jika user (role = relawan atau volunteer_status = "approved").
-  Didesain dengan *Tactical Mode* & *High Contrast*.
+  Status: 🟡 UI SELESAI — DATA MOCK
 
-  Fitur & Data yang ditampilkan:
-    - Status ketersediaan relawan (Toggle On/Off Duty)
-    - Poin & Level Gamifikasi
-    - Spesialisasi Relawan
-    - Panggilan Misi (Radar Darurat Aktif)
+  Tampil sebagai tab ekstra "Operasi" jika role = volunteer / is_verified_volunteer = true.
 
   API yang DIBUTUHKAN:
-    GET /api/volunteer/dashboard
+    GET /api/v1/volunteer/dashboard
     Headers: Authorization: Bearer <token>
-    Response: {
-      "is_available_for_mission": true,
-      "specialization": "Medis & First Aid",
-      "volunteer_points": 120,
-      "volunteer_level": "Relawan Madya",
-      "active_mission": {
-         "id": "1",
-         "description": "Kecelakaan lalu lintas...",
-         "distance_km": 1.2
-      }
-    }
 
 ─────────────────────────────────────────────────────────────
 4.10 SETTINGS SCREEN (features/masyarakat/settings_screen.dart)
 ─────────────────────────────────────────────────────────────
-  Konfigurasi preferensi pengguna secara lokal & server.
-  
-  Fitur:
-    - Toggle Notifikasi Push & SMS
-    - Akses Lokasi (Background Permission)
-    - Tema (Light/Dark Mode)
-    - Bahasa (Indonesia/English)
-    - Ganti Password & Hapus Akun
+  Status: 🟡 UI SELESAI — API BELUM TERHUBUNG
 
-  Catatan implementasi terbaru:
-    - Pemilihan bahasa di Settings memicu perubahan locale global aplikasi.
-    - Locale dikelola melalui ValueNotifier di main.dart:
-        SiagaKitaApp.localeNotifier
-    - Bahasa yang tersedia:
-        "id" (Bahasa Indonesia) dan "en" (English)
-    - Teks lintas modul kini memakai translasi lokal melalui:
-        'teks'.tr(context)
-    - Karena translasi saat ini masih berbasis kamus frontend,
-      backend belum wajib menyediakan endpoint khusus bahasa.
+  Fitur aktif (lokal):
+    - Toggle Dark/Light mode (ValueNotifier di main.dart)
+    - Ganti bahasa ID/EN (ValueNotifier localeNotifier di main.dart)
 
-─────────────────────────────────────────────────────────────
-4.11 ABOUT SCREEN (features/masyarakat/about_screen.dart)
-─────────────────────────────────────────────────────────────
-  Halaman statis informasi aplikasi.
-  
-  Konten:
-    - Logo SIAGAKITA & Versi Build
-    - Deskripsi Misi Aplikasi
-    - Tautan Syarat & Ketentuan (TOS)
-    - Tautan Kebijakan Privasi
-
+  Fitur yang butuh API:
+    - Ganti password
+    - Hapus akun
 
 ===========================================================================
-5. RINGKASAN ENDPOINT API YANG DIBUTUHKAN
+5. RINGKASAN ENDPOINT API
 ===========================================================================
 
-  Method | Endpoint                   | Deskripsi
-  -------|----------------------------|-------------------------------------------
-  POST   | /api/auth/login            | Login, return JWT token + user (dgn role)
-  POST   | /api/auth/register         | Registrasi pengguna baru
-  POST   | /api/auth/send-otp         | Kirim OTP ke nomor telepon
-  POST   | /api/auth/verify-otp       | Verifikasi kode OTP
-  POST   | /api/auth/upload-ktp       | Upload foto KTP (multipart)
-  POST   | /api/auth/upload-selfie    | Upload foto selfie (multipart)
-  POST   | /api/auth/logout           | Logout (invalidate token)
-  POST   | /api/user/biodata          | Simpan biodata kesehatan
-  GET    | /api/user/profile          | Ambil data profil pengguna login
-  POST   | /api/sos/trigger           | Kirim sinyal SOS + koordinat GPS
-  POST   | /api/report/create         | Buat laporan kejadian darurat (multipart)
-  GET    | /api/map/nearby            | Ambil data relawan & fasilitas terdekat
-  GET    | /api/guides                | Ambil daftar panduan (opsional, bisa offline)
+  ★ = Sudah terhubung ke Flutter
+  ○ = Belum terhubung (dibutuhkan sprint berikutnya)
+
+  Method | Endpoint                           | Status | Deskripsi
+  -------|------------------------------------|---------|---------------------------------
+  POST   | /api/v1/auth/register              | ★      | Buat akun → kirim Email OTP
+  POST   | /api/v1/auth/verify-register-otp   | ★      | Verifikasi OTP → return JWT
+  POST   | /api/v1/auth/login                 | ★      | Email+Password → JWT langsung
+  POST   | /api/v1/auth/request-otp           | ★      | Kirim OTP WA (phone verification)
+  POST   | /api/v1/auth/verify-otp            | ★      | Verifikasi OTP WA
+  GET    | /api/v1/users/profile              | ○      | Ambil profil lengkap
+  POST   | /api/v1/users/biodata              | ○      | Simpan biodata kesehatan
+  POST   | /api/v1/users/phone/request-otp    | ○      | Kirim OTP WA ke nomor HP baru
+  POST   | /api/v1/users/phone/verify-otp     | ○      | Konfirmasi OTP HP
+  GET    | /api/v1/incidents/active           | ★      | Cek SOS aktif milik user
+  POST   | /api/v1/incidents/trigger          | ★      | Kirim SOS + koordinat GPS
+  POST   | /api/v1/incidents/:id/cancel       | ★      | Batalkan SOS aktif
+  PUT    | /api/v1/incidents/:id/location     | ★      | Update GPS tiap 1 menit
+  POST   | /api/v1/incidents/:id/resolve      | ○      | Tandai selesai (oleh relawan)
+  PUT    | /api/v1/telemetry/location         | ○      | Real-time location via WS hub
 
 ===========================================================================
-6. AUTENTIKASI
+6. TOKEN & AUTENTIKASI
 ===========================================================================
 
-  Frontend akan menyimpan JWT token setelah login berhasil.
-  Token dikirim di SETIAP request yang butuh autentikasi via header:
+  Setelah login/register berhasil, frontend menerima:
+    - access_token  : JWT berumur pendek (dipakai di Authorization header)
+    - refresh_token : JWT berumur panjang (untuk perbarui access_token)
 
-    Authorization: Bearer <token>
+  Saat ini token disimpan di memory (belum ke secure storage).
+  SPRINT BERIKUTNYA: Simpan ke flutter_secure_storage.
 
-  Token akan dihapus dari storage saat user logout atau session expired.
+  Semua request protected menggunakan header:
+    Authorization: Bearer <access_token>
+
+  Token dilewatkan sebagai parameter (accessToken, userId) dari:
+    LoginScreen → MainScreen → HomeScreen
+    RegisterScreen → BiodataScreen → MainScreen
 
 ===========================================================================
 7. CATATAN TAMBAHAN UNTUK BACKEND
 ===========================================================================
 
-  1. ROLE-BASED ROUTING: Field "role" di response /api/auth/login
-     SANGAT KRUSIAL. Frontend akan redirect ke halaman berbeda
-     tergantung nilai role yang diterima.
-     Nilai yang valid: "masyarakat" | "relawan" | "instansi" | "admin"
+  1. ROLE VALUE: Backend menggunakan enum: civilian | volunteer |
+     agency_responder | admin. Flutter UserModel memetakan ke:
+     masyarakat | relawan | instansi | admin.
 
-  2. KOORDINAT GPS: Semua fitur kritikal (SOS, Report, Map) bergantung
-     pada koordinat GPS. Pastikan backend dapat menerima format:
-     latitude dan longitude dalam format desimal (Double).
+  2. DOCKER SERVICE NAME: Nama service di docker-compose.yml adalah
+     "backend" (bukan "api"). Command deploy:
+     sudo docker compose -f infrastructure/docker-compose.yml up --build -d backend
 
-  3. UPLOAD FILE: Fitur KTP, selfie, foto laporan, dan audio laporan
-     menggunakan multipart/form-data. Pastikan backend siap menerima
-     file image (jpg/png) dan audio (mp3/aac/wav).
+  3. GPS FORMAT: Koordinat dalam Double (desimal). Backend sudah
+     menerima latitude + longitude di incidents dan telemetry.
 
-  4. URGENCY LEVEL di laporan dikirim sebagai INTEGER:
-     0 = Ringan, 1 = Sedang, 2 = Kritis
+  4. ROLLBACK REGISTER: Jika SMTP gagal kirim OTP, backend melakukan
+     hard delete user (Unscoped) agar email bisa dipakai ulang.
 
-  5. STATUS LAPORAN yang diharapkan frontend (untuk update UI nanti):
-     "pending" | "diproses" | "selesai" | "ditolak"
+  5. SOS POLICY: Pengguna yang belum verifikasi HP (is_phone_verified=false)
+     TETAP bisa kirim SOS. Flag ini bisa ditampilkan di dashboard admin
+     sebagai "IDENTITAS BELUM TERVERIFIKASI".
 
-  6. MODEL RELAWAN TERBARU menambah kolom extra untuk routing dinamic:
-     - "volunteer_status" (string) -> menentukan tab Operasi disematkan.
-     - "is_available_for_mission" (bool) -> switch duty di dasbor relawan.
-     - "specialization" (string) -> didapat dari pendaftaran.
-     
-  7. SCREEN INSTANSI, dan ADMIN saat ini masih PLACEHOLDER.
-     Akan dikembangkan menyusul setelah relawan disempurnakan.
+  6. PHONE NULLABLE: Setelah refactor, phone_number di tabel users
+     adalah NULLABLE. Diisi via POST /users/phone/request-otp.
 
-  8. LOKALISASI (ID/EN) saat ini dikelola frontend-side.
-     Jika backend nanti ingin sinkron preferensi bahasa per user,
-     bisa ditambahkan field opsional "preferred_language":
-     "id" | "en" pada profil pengguna.
+  7. SCREEN INSTANSI & ADMIN masih PLACEHOLDER.
+     Akan dikembangkan di fase windows_console_flutter.
+
+  8. LOKALISASI (ID/EN) dikelola frontend-side via ValueNotifier.
+     Tidak butuh endpoint backend untuk bahasa.
 
 ===========================================================================
   Dibuat oleh: Tim Frontend SiagaKita
   Branch: frontend / main
   Repo:   https://github.com/SuperBypassUdinnn/SIAGAKITA
+  Diperbarui: 29 April 2026
 ===========================================================================

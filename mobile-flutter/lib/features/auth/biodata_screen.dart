@@ -3,7 +3,14 @@ import '../../core/localization/app_localization.dart';
 import 'login_screen.dart';
 
 class BiodataScreen extends StatefulWidget {
-  const BiodataScreen({super.key});
+  final String accessToken;
+  final String userId;
+
+  const BiodataScreen({
+    super.key,
+    required this.accessToken,
+    required this.userId,
+  });
 
   @override
   State<BiodataScreen> createState() => _BiodataScreenState();

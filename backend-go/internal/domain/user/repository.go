@@ -43,6 +43,32 @@ func (r *Repository) FindByID(id string) (*User, error) {
 	return &user, nil
 }
 
+// DeleteUserByEmail hard-deletes a user by email.
+// Digunakan untuk rollback ketika pembuatan akun gagal di langkah pengiriman OTP.
+func (r *Repository) DeleteUserByEmail(email string) error {
+	return r.db.Unscoped().Where("email = ?", email).Delete(&User{}).Error
+}
+
+// SetEmailVerified menandai email pengguna sebagai terverifikasi.
+func (r *Repository) SetEmailVerified(userID string) error {
+	return r.db.Model(&User{}).Where("id = ?", userID).
+		Update("is_email_verified", true).Error
+}
+
+// SetPhoneVerified menandai nomor HP pengguna sebagai terverifikasi.
+func (r *Repository) SetPhoneVerified(userID string) error {
+	return r.db.Model(&User{}).Where("id = ?", userID).
+		Update("is_phone_verified", true).Error
+}
+
+// UpdatePhoneNumber menyimpan nomor HP pengguna (is_phone_verified direset ke false).
+func (r *Repository) UpdatePhoneNumber(userID, phone string) error {
+	return r.db.Model(&User{}).Where("id = ?", userID).Updates(map[string]interface{}{
+		"phone_number":    phone,
+		"is_phone_verified": false,
+	}).Error
+}
+
 // SaveBiodata runs a DB transaction that updates three tables atomically:
 // users, user_medical_profiles, and emergency_contacts.
 func (r *Repository) SaveBiodata(userID string, req *BiodataRequest) error {
@@ -127,6 +153,8 @@ func (r *Repository) GetProfile(userID string) (*ProfileResponse, error) {
 		PhoneNumber:         user.PhoneNumber,
 		Role:                user.Role,
 		IsVerifiedVolunteer: user.IsVerifiedVolunteer,
+		IsEmailVerified:     user.IsEmailVerified,
+		IsPhoneVerified:     user.IsPhoneVerified,
 		EmergencyContacts:   contacts,
 	}
 

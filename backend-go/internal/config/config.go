@@ -30,6 +30,13 @@ type Config struct {
 	// WhatsApp Gateway (Fonnte)
 	FonnteToken string
 
+	// Email Gateway (SMTP)
+	SMTPHost     string
+	SMTPPort     string
+	SMTPUsername string
+	SMTPPassword string
+	SMTPFrom     string
+
 	// Server
 	HTTPPort string
 	WSPort   string
@@ -61,6 +68,11 @@ func Load() *Config {
 		JWTRefreshTTL:    refreshTTL,
 		SMSGatewaySecret: getEnv("SMS_GATEWAY_SECRET", ""),
 		FonnteToken:      getEnv("FONNTE_TOKEN", ""),
+		SMTPHost:         getEnv("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:         getEnv("SMTP_PORT", "587"),
+		SMTPUsername:     getEnv("SMTP_USERNAME", ""),
+		SMTPPassword:     getEnv("SMTP_PASSWORD", ""),
+		SMTPFrom:         getEnv("SMTP_FROM", ""),
 		HTTPPort:         getEnv("HTTP_PORT", "8080"),
 		WSPort:           getEnv("WS_PORT", "8081"),
 	}

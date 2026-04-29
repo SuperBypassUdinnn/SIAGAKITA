@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict jStqiQY1TvPfc8CeB4THRgmeAQOYc8dQUjTleHa8J7Yww8HDqVpuaf7FWUnbbnD
+\restrict 6BqU5N7nDABDmHLYx2L0t7PNtJ5dryMvw0YlL4JsiHoPXHEs9ER01z3zNSWzRQ0
 
 -- Dumped from database version 15.17
 -- Dumped by pg_dump version 15.17
@@ -50,7 +50,6 @@ COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UU
 -- Name: agency_type; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.agency_type CASCADE;
 CREATE TYPE public.agency_type AS ENUM (
     'police',
     'fire',
@@ -65,7 +64,6 @@ ALTER TYPE public.agency_type OWNER TO siagakita_admin;
 -- Name: blood_type_enum; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.blood_type_enum CASCADE;
 CREATE TYPE public.blood_type_enum AS ENUM (
     'A',
     'B',
@@ -81,7 +79,6 @@ ALTER TYPE public.blood_type_enum OWNER TO siagakita_admin;
 -- Name: cert_status; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.cert_status CASCADE;
 CREATE TYPE public.cert_status AS ENUM (
     'pending',
     'approved',
@@ -96,7 +93,6 @@ ALTER TYPE public.cert_status OWNER TO siagakita_admin;
 -- Name: incident_category; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.incident_category CASCADE;
 CREATE TYPE public.incident_category AS ENUM (
     'medical',
     'fire',
@@ -112,7 +108,6 @@ ALTER TYPE public.incident_category OWNER TO siagakita_admin;
 -- Name: incident_status; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.incident_status CASCADE;
 CREATE TYPE public.incident_status AS ENUM (
     'grace_period',
     'broadcasting',
@@ -128,7 +123,6 @@ ALTER TYPE public.incident_status OWNER TO siagakita_admin;
 -- Name: response_status; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.response_status CASCADE;
 CREATE TYPE public.response_status AS ENUM (
     'en_route',
     'on_scene',
@@ -143,7 +137,6 @@ ALTER TYPE public.response_status OWNER TO siagakita_admin;
 -- Name: user_role; Type: TYPE; Schema: public; Owner: siagakita_admin
 --
 
-DROP TYPE IF EXISTS public.user_role CASCADE;
 CREATE TYPE public.user_role AS ENUM (
     'civilian',
     'volunteer',
@@ -270,12 +263,12 @@ CREATE TABLE public.incidents (
     incident_type public.incident_category NOT NULL,
     latitude numeric(10,8) NOT NULL,
     longitude numeric(11,8) NOT NULL,
-    status character varying(50) DEFAULT 'grace_period'::character varying NOT NULL,
+    status public.incident_status DEFAULT 'grace_period'::public.incident_status,
     address_detail text,
-    trigger_method character varying(20) DEFAULT 'timeout'::character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now(),
-    resolved_at timestamp with time zone
+    resolved_at timestamp with time zone,
+    trigger_method character varying(20) DEFAULT 'timeout'::character varying NOT NULL
 );
 
 
@@ -365,9 +358,11 @@ CREATE TABLE public.users (
     password_hash character varying(255) NOT NULL,
     role public.user_role DEFAULT 'civilian'::public.user_role NOT NULL,
     is_verified_volunteer boolean DEFAULT false,
-    created_at timestamp with time zone DEFAULT now(),
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now(),
-    deleted_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    is_email_verified boolean DEFAULT false,
+    is_phone_verified boolean DEFAULT false
 );
 
 
@@ -757,5 +752,5 @@ ALTER TABLE ONLY public.volunteer_reputation
 -- PostgreSQL database dump complete
 --
 
-\unrestrict jStqiQY1TvPfc8CeB4THRgmeAQOYc8dQUjTleHa8J7Yww8HDqVpuaf7FWUnbbnD
+\unrestrict 6BqU5N7nDABDmHLYx2L0t7PNtJ5dryMvw0YlL4JsiHoPXHEs9ER01z3zNSWzRQ0
 

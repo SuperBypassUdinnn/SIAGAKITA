@@ -12,8 +12,10 @@ type User struct {
 	PhoneNumber         *string    `json:"phone_number,omitempty"`
 	Email               string     `gorm:"uniqueIndex;not null" json:"email"`
 	PasswordHash        string     `gorm:"not null" json:"-"`
-	Role                string     `gorm:"default:'masyarakat'" json:"role"`
+	Role                string     `gorm:"default:'civilian'" json:"role"`
 	IsVerifiedVolunteer bool       `gorm:"default:false" json:"is_verified_volunteer"`
+	IsEmailVerified     bool       `gorm:"default:false" json:"is_email_verified"`
+	IsPhoneVerified     bool       `gorm:"default:false" json:"is_phone_verified"`
 	CreatedAt           time.Time  `json:"created_at"`
 	UpdatedAt           time.Time  `json:"updated_at"`
 	DeletedAt           *time.Time `gorm:"index" json:"-"`
@@ -75,6 +77,23 @@ type BiodataRequest struct {
 	EmergencyRelation     *string `json:"emergency_relation"`
 }
 
+// VerifyEmailOTPRequest digunakan untuk endpoint verifikasi OTP email.
+type VerifyEmailOTPRequest struct {
+	Email   string `json:"email"`
+	OTPCode string `json:"otp_code"`
+}
+
+// PhoneUpdateRequest digunakan untuk request OTP verifikasi nomor HP.
+type PhoneUpdateRequest struct {
+	PhoneNumber string `json:"phone_number"`
+}
+
+// VerifyPhoneRequest digunakan untuk konfirmasi OTP nomor HP.
+type VerifyPhoneRequest struct {
+	PhoneNumber string `json:"phone_number"`
+	OTPCode     string `json:"otp_code"`
+}
+
 // ─── Response DTOs ─────────────────────────────────────────────────────────────
 
 type AuthResponse struct {
@@ -89,6 +108,8 @@ type UserInfo struct {
 	Email               string `json:"email"`
 	Role                string `json:"role"`
 	IsVerifiedVolunteer bool   `json:"is_verified_volunteer"`
+	IsEmailVerified     bool   `json:"is_email_verified"`
+	IsPhoneVerified     bool   `json:"is_phone_verified"`
 }
 
 type ProfileResponse struct {
@@ -100,6 +121,8 @@ type ProfileResponse struct {
 	DateOfBirth         *string              `json:"date_of_birth,omitempty"`
 	Role                string               `json:"role"`
 	IsVerifiedVolunteer bool                 `json:"is_verified_volunteer"`
+	IsEmailVerified     bool                 `json:"is_email_verified"`
+	IsPhoneVerified     bool                 `json:"is_phone_verified"`
 	MedicalData         *UserMedicalProfile  `json:"medical_data,omitempty"`
 	EmergencyContacts   []EmergencyContact   `json:"emergency_contacts"`
 	VolunteerReputation *VolunteerReputation `json:"volunteer_reputation,omitempty"`

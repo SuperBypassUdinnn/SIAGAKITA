@@ -1,6 +1,10 @@
 package incident
 
-import "math"
+import (
+	"errors"
+	"math"
+	"time"
+)
 
 // incidentTypeMultiplier maps incident_type strings to XP multipliers.
 var incidentTypeMultiplier = map[string]float64{
@@ -19,6 +23,68 @@ type Service struct {
 // NewService creates a new incident Service.
 func NewService(repo *Repository) *Service {
 	return &Service{repo: repo}
+}
+
+// ─── TriggerSOS ───────────────────────────────────────────────────────────────
+
+func (s *Service) TriggerSOS(reporterID string, req *TriggerSOSRequest) (*TriggerSOSResponse, error) {
+	inc := &Incident{
+		ReporterID:    reporterID,
+		Latitude:      req.Latitude,
+		Longitude:     req.Longitude,
+		IncidentType:  req.IncidentType,
+		AddressDetail: req.AddressDetail,
+		TriggerMethod: req.TriggerMethod,
+		Status:        "broadcasting",
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+	}
+	if err := s.repo.CreateIncident(inc); err != nil {
+		return nil, err
+	}
+	return &TriggerSOSResponse{
+		IncidentID: inc.ID,
+		Status:     inc.Status,
+		Message:    "SOS berhasil dikirim. Tim sedang dihubungi.",
+	}, nil
+}
+
+// ─── CancelSOS ────────────────────────────────────────────────────────────────
+
+func (s *Service) CancelSOS(id uint, reporterID string) error {
+	inc, err := s.repo.FindByID(id)
+	if err != nil {
+		return err
+	}
+	if inc.ReporterID != reporterID {
+		return errors.New("unauthorized")
+	}
+	return s.repo.MarkCancelled(id)
+}
+
+// ─── UpdateLocation ───────────────────────────────────────────────────────────
+
+func (s *Service) UpdateLocation(id uint, lat, lng float64) error {
+	return s.repo.UpdateLocation(id, lat, lng)
+}
+
+// ─── GetActive ────────────────────────────────────────────────────────────────
+
+func (s *Service) GetActive(reporterID string) (*ActiveIncidentResponse, error) {
+	inc, err := s.repo.FindActiveByReporter(reporterID)
+	if err != nil {
+		return nil, err
+	}
+	if inc == nil {
+		return nil, nil
+	}
+	return &ActiveIncidentResponse{
+		IncidentID: inc.ID,
+		Status:     inc.Status,
+		Latitude:   inc.Latitude,
+		Longitude:  inc.Longitude,
+		CreatedAt:  inc.CreatedAt.Format(time.RFC3339),
+	}, nil
 }
 
 // Resolve marks an incident as resolved, calculates XP, awards it to the

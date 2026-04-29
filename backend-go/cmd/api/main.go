@@ -38,9 +38,17 @@ func main() {
 	wsHub := hub.New()
 
 	// ── 4. Domain wiring ──────────────────────────────────────────────────────
-	// User domain
+	// OTP domain
+	fonnteGateway := otpDomain.NewFonnteGateway(cfg.FonnteToken)
+	emailGateway := otpDomain.NewSMTPEmailGateway(
+		cfg.SMTPHost, cfg.SMTPPort, cfg.SMTPUsername, cfg.SMTPPassword, cfg.SMTPFrom,
+	)
+	otpSvc := otpDomain.NewService(rdb, fonnteGateway, emailGateway)
+	otpHandler := otpDomain.NewHandler(otpSvc)
+
+	// User domain (depends on otpSvc for 2FA)
 	userRepo := userDomain.NewRepository(db)
-	userSvc := userDomain.NewService(userRepo, cfg)
+	userSvc := userDomain.NewService(userRepo, cfg, otpSvc)
 	userHandler := userDomain.NewHandler(userSvc)
 
 	// Incident domain
@@ -48,15 +56,8 @@ func main() {
 	incidentSvc := incidentDomain.NewService(incidentRepo)
 	incidentHandler := incidentDomain.NewHandler(incidentSvc)
 
-	// OTP domain
-	fonnteGateway := otpDomain.NewFonnteGateway(cfg.FonnteToken)
-	otpSvc := otpDomain.NewService(rdb, fonnteGateway)
-	otpHandler := otpDomain.NewHandler(otpSvc)
-
 	// Telemetry domain
 	telemetryHandler := telemetry.NewHandler(rdb, wsHub, cfg)
-
-	// ── 5. Fiber REST API ─────────────────────────────────────────────────────
 	app := fiber.New(fiber.Config{
 		AppName: "SiagaKita API v1",
 	})
@@ -82,7 +83,10 @@ func main() {
 	// Auth (public)
 	auth := v1.Group("/auth")
 	auth.Post("/register", userHandler.Register)
+	auth.Post("/verify-register-otp", userHandler.VerifyRegisterOTP)
 	auth.Post("/login", userHandler.Login)
+	auth.Post("/verify-login-otp", userHandler.VerifyLoginOTP)
+	// OTP WhatsApp endpoint (masih dipakai untuk phone verification di profile)
 	auth.Post("/request-otp", otpHandler.RequestOTP)
 	auth.Post("/verify-otp", otpHandler.VerifyOTP)
 
@@ -91,9 +95,16 @@ func main() {
 	users := v1.Group("/users", authMw)
 	users.Post("/biodata", userHandler.SaveBiodata)
 	users.Get("/profile", userHandler.GetProfile)
+	// Phone verification (dalam profile — butuh JWT)
+	users.Post("/phone/request-otp", userHandler.RequestPhoneVerification)
+	users.Post("/phone/verify-otp", userHandler.ConfirmPhoneOTP)
 
 	// Incidents (protected)
 	incidents := v1.Group("/incidents", authMw)
+	incidents.Get("/active", incidentHandler.GetActive)
+	incidents.Post("/trigger", incidentHandler.TriggerSOS)
+	incidents.Post("/:id/cancel", incidentHandler.CancelSOS)
+	incidents.Put("/:id/location", incidentHandler.UpdateLocation)
 	incidents.Post("/:id/resolve", incidentHandler.Resolve)
 
 	// Telemetry (protected)

@@ -54,6 +54,38 @@ func (r *Repository) MarkResolved(id uint) (*Incident, error) {
 	return r.FindByID(id)
 }
 
+// MarkCancelled sets status=false_alarm for an incident.
+func (r *Repository) MarkCancelled(id uint) error {
+	return r.db.Model(&Incident{}).Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"status":     "false_alarm",
+			"updated_at": time.Now(),
+		}).Error
+}
+
+// UpdateLocation updates latitude/longitude of an active incident.
+func (r *Repository) UpdateLocation(id uint, lat, lng float64) error {
+	return r.db.Model(&Incident{}).Where("id = ?", id).
+		Updates(map[string]interface{}{
+			"latitude":   lat,
+			"longitude":  lng,
+			"updated_at": time.Now(),
+		}).Error
+}
+
+// FindActiveByReporter returns the latest non-resolved, non-cancelled incident
+// for a given reporter (user's in-progress SOS).
+func (r *Repository) FindActiveByReporter(reporterID string) (*Incident, error) {
+	var inc Incident
+	err := r.db.Where(
+		"reporter_id = ? AND status NOT IN ('resolved','false_alarm')", reporterID,
+	).Order("created_at DESC").First(&inc).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, nil
+	}
+	return &inc, err
+}
+
 // CreateResponse inserts an incident_responses record.
 func (r *Repository) CreateResponse(resp *IncidentResponse) error {
 	now := time.Now()
