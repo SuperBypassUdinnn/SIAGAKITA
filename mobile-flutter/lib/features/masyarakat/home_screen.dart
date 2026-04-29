@@ -37,6 +37,15 @@ class _HomeScreenState extends State<HomeScreen>
   int _confirmCountdown = 5;
   Timer? _confirmTimer;
 
+  // ─── SOS Phase State Machine ────────────────────────────────────────────────
+  // idle → gracePeriod → broadcasting → (cancelled)
+  String _sosPhase = 'idle'; // 'idle' | 'gracePeriod' | 'broadcasting'
+
+  // ─── Grace Period State ─────────────────────────────────────────────────────
+  int _graceCountdown = 10;
+  Timer? _graceTimer;
+  String? _pendingIncidentId;
+
   // ─── Active SOS State ───────────────────────────────────────────────────────
   ActiveIncident? _activeIncident;
   bool _showSOSSentBanner = false;
@@ -57,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
     _tapResetTimer?.cancel();
     _confirmTimer?.cancel();
     _locationUpdateTimer?.cancel();
+    _graceTimer?.cancel();
     super.dispose();
   }
 
@@ -205,7 +215,6 @@ class _HomeScreenState extends State<HomeScreen>
       _tapCount = 0;
     });
 
-    // Ambil koordinat GPS
     final pos = await LocationService.getCurrentPositionOrNull();
     final lat = pos?.latitude ?? 0.0;
     final lng = pos?.longitude ?? 0.0;
@@ -219,23 +228,17 @@ class _HomeScreenState extends State<HomeScreen>
       );
 
       if (!mounted) return;
-      final newIncident = ActiveIncident(
-        incidentId: result.incidentId,
-        status: result.status,
-        latitude: lat,
-        longitude: lng,
-        createdAt: DateTime.now().toIso8601String(),
-      );
-      setState(() {
-        _activeIncident = newIncident;
-        _showSOSSentBanner = true;
-        _lastTriggerMethod = triggeredBy;
-      });
-      _startLocationUpdates();
 
-      Future.delayed(const Duration(seconds: 4), () {
-        if (mounted) setState(() => _showSOSSentBanner = false);
+      // Masuk ke fase grace period — tampilkan 4 tombol tipe
+      setState(() {
+        _pendingIncidentId = result.incidentId;
+        _sosPhase = 'gracePeriod';
+        _graceCountdown = 10;
       });
+      _startGracePeriodCountdown();
+    } on SOSBannedException catch (e) {
+      if (!mounted) return;
+      _showSOSBannedDialog(e.toString());
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -245,6 +248,85 @@ class _HomeScreenState extends State<HomeScreen>
         ),
       );
     }
+  }
+
+  // ─── Grace Period: countdown & pilih tipe ────────────────────────────────────
+
+  void _startGracePeriodCountdown() {
+    _graceTimer?.cancel();
+    _graceTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) { timer.cancel(); return; }
+      setState(() => _graceCountdown--);
+      HapticFeedback.selectionClick();
+      if (_graceCountdown <= 0) {
+        timer.cancel();
+        _onGraceTimeout();
+      }
+    });
+  }
+
+  Future<void> _onSelectIncidentType(String type) async {
+    _graceTimer?.cancel();
+    if (_pendingIncidentId == null) return;
+    try {
+      await IncidentService.updateType(
+        accessToken: widget.accessToken,
+        incidentId: _pendingIncidentId!,
+        incidentType: type,
+      );
+    } catch (_) {/* silent */}
+    _transitionToBroadcasting();
+  }
+
+  Future<void> _onGraceTimeout() async {
+    if (_pendingIncidentId == null) return;
+    await IncidentService.broadcast(
+      accessToken: widget.accessToken,
+      incidentId: _pendingIncidentId!,
+    );
+    _transitionToBroadcasting();
+  }
+
+  void _transitionToBroadcasting() {
+    if (!mounted) return;
+    final newIncident = ActiveIncident(
+      incidentId: _pendingIncidentId!,
+      status: 'broadcasting',
+      incidentType: 'unknown',
+      latitude: 0,
+      longitude: 0,
+      createdAt: DateTime.now().toIso8601String(),
+    );
+    setState(() {
+      _activeIncident = newIncident;
+      _pendingIncidentId = null;
+      _sosPhase = 'broadcasting';
+      _showSOSSentBanner = true;
+    });
+    _startLocationUpdates();
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _showSOSSentBanner = false);
+    });
+  }
+
+  void _showSOSBannedDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Row(children: [
+          Icon(Icons.block, color: Colors.red),
+          SizedBox(width: 8),
+          Text('SOS Dinonaktifkan'),
+        ]),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
   }
 
   // ─── Cancel Active SOS ───────────────────────────────────────────────────────
@@ -265,7 +347,10 @@ class _HomeScreenState extends State<HomeScreen>
       );
       if (!mounted) return;
       _stopLocationUpdates();
-      setState(() => _activeIncident = null);
+      setState(() {
+        _activeIncident = null;
+        _sosPhase = 'idle';
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('SOS berhasil dibatalkan.'),
@@ -562,9 +647,13 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ),
 
-            // ── Confirmation Dialog Overlay ────────────────────────────────────
+            // ── Confirmation Dialog Overlay ─────────────────────────────────
             if (_showConfirmDialog)
               _buildConfirmDialog(context, primaryColor, colors),
+
+            // ── Grace Period Overlay (pilih tipe insiden) ──────────────────
+            if (_sosPhase == 'gracePeriod')
+              _buildGracePeriodOverlay(colors),
 
             // ── SOS Sent Banner ────────────────────────────────────────────────
             if (_showSOSSentBanner)
@@ -672,6 +761,135 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   // ─── Confirmation Dialog ────────────────────────────────────────────────────
+
+  // ─── Grace Period Overlay ─────────────────────────────────────────────────────
+
+  Widget _buildGracePeriodOverlay(ColorScheme colors) {
+    final types = [
+      {'label': 'KEBAKARAN', 'icon': '🔥', 'value': 'fire'},
+      {'label': 'MEDIS', 'icon': '🚑', 'value': 'medical'},
+      {'label': 'KRIMINAL', 'icon': '🔪', 'value': 'crime'},
+      {'label': 'KECELAKAAN', 'icon': '💥', 'value': 'rescue'},
+    ];
+
+    return Container(
+      color: const Color(0xFFCC0000),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                '🆘 SOS DIKIRIM',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Pilih jenis darurat (opsional)',
+                style: TextStyle(color: Colors.white70, fontSize: 14),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Tidak memilih pun tidak apa-apa — bantuan tetap datang',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.white54, fontSize: 11),
+              ),
+              const SizedBox(height: 32),
+              GridView.count(
+                shrinkWrap: true,
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 1.4,
+                children: types.map((t) {
+                  return GestureDetector(
+                    onTap: () => _onSelectIncidentType(t['value']!),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(t['icon']!, style: const TextStyle(fontSize: 36)),
+                          const SizedBox(height: 8),
+                          Text(
+                            t['label']!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 32),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: _graceCountdown / 10,
+                  minHeight: 10,
+                  backgroundColor: Colors.white24,
+                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '$_graceCountdown detik',
+                style: const TextStyle(color: Colors.white70, fontSize: 13),
+              ),
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    _graceTimer?.cancel();
+                    IncidentService.cancelSOS(
+                      accessToken: widget.accessToken,
+                      incidentId: _pendingIncidentId!,
+                    );
+                    setState(() {
+                      _sosPhase = 'idle';
+                      _pendingIncidentId = null;
+                    });
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white54),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: const Text(
+                    'BATALKAN SOS',
+                    style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.5),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Confirmation Dialog ─────────────────────────────────────────────────────
 
   Widget _buildConfirmDialog(
       BuildContext context, Color primaryColor, ColorScheme colors) {

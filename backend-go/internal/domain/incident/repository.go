@@ -17,64 +17,54 @@ func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{db: db}
 }
 
-// CreateIncident inserts a new incident row and returns its ID.
+// ─── Incident (Jalur A — SOS Darurat) ─────────────────────────────────────────
+
 func (r *Repository) CreateIncident(inc *Incident) error {
 	return r.db.Create(inc).Error
 }
 
-// FindByID fetches an incident by primary key.
-func (r *Repository) FindByID(id uint) (*Incident, error) {
+func (r *Repository) FindByID(id string) (*Incident, error) {
 	var inc Incident
-	if err := r.db.First(&inc, id).Error; err != nil {
+	if err := r.db.First(&inc, "id = ?", id).Error; err != nil {
 		return nil, err
 	}
 	return &inc, nil
 }
 
-// UpdateStatus changes an incident's status field.
-func (r *Repository) UpdateStatus(id uint, status string) error {
+func (r *Repository) UpdateStatus(id, status string) error {
 	return r.db.Model(&Incident{}).Where("id = ?", id).
-		Updates(map[string]interface{}{
-			"status":     status,
-			"updated_at": time.Now(),
-		}).Error
+		Updates(map[string]interface{}{"status": status, "updated_at": time.Now()}).Error
 }
 
-// MarkResolved sets status=resolved and resolved_at=now for an incident.
-func (r *Repository) MarkResolved(id uint) (*Incident, error) {
+func (r *Repository) UpdateType(id, incidentType string) error {
+	return r.db.Model(&Incident{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"incident_type": incidentType, "updated_at": time.Now()}).Error
+}
+
+func (r *Repository) MarkResolved(id string) (*Incident, error) {
 	now := time.Now()
 	if err := r.db.Model(&Incident{}).Where("id = ?", id).
-		Updates(map[string]interface{}{
-			"status":      "resolved",
-			"resolved_at": now,
-			"updated_at":  now,
-		}).Error; err != nil {
+		Updates(map[string]interface{}{"status": "resolved", "resolved_at": now, "updated_at": now}).Error; err != nil {
 		return nil, err
 	}
 	return r.FindByID(id)
 }
 
-// MarkCancelled sets status=false_alarm for an incident.
-func (r *Repository) MarkCancelled(id uint) error {
+func (r *Repository) MarkCancelled(id string) error {
 	return r.db.Model(&Incident{}).Where("id = ?", id).
-		Updates(map[string]interface{}{
-			"status":     "false_alarm",
-			"updated_at": time.Now(),
-		}).Error
+		Updates(map[string]interface{}{"status": "false_alarm", "updated_at": time.Now()}).Error
 }
 
-// UpdateLocation updates latitude/longitude of an active incident.
-func (r *Repository) UpdateLocation(id uint, lat, lng float64) error {
+func (r *Repository) MarkFalseAlarm(id string) error {
 	return r.db.Model(&Incident{}).Where("id = ?", id).
-		Updates(map[string]interface{}{
-			"latitude":   lat,
-			"longitude":  lng,
-			"updated_at": time.Now(),
-		}).Error
+		Updates(map[string]interface{}{"status": "false_alarm", "updated_at": time.Now()}).Error
 }
 
-// FindActiveByReporter returns the latest non-resolved, non-cancelled incident
-// for a given reporter (user's in-progress SOS).
+func (r *Repository) UpdateLocation(id string, lat, lng float64) error {
+	return r.db.Model(&Incident{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"latitude": lat, "longitude": lng, "updated_at": time.Now()}).Error
+}
+
 func (r *Repository) FindActiveByReporter(reporterID string) (*Incident, error) {
 	var inc Incident
 	err := r.db.Where(
@@ -86,14 +76,93 @@ func (r *Repository) FindActiveByReporter(reporterID string) (*Incident, error) 
 	return &inc, err
 }
 
-// CreateResponse inserts an incident_responses record.
+// ─── Incident Report (Jalur B — Laporan Warga) ────────────────────────────────
+
+func (r *Repository) CreateReport(rep *IncidentReport) error {
+	return r.db.Create(rep).Error
+}
+
+func (r *Repository) FindReports(status string) ([]IncidentReport, error) {
+	var reps []IncidentReport
+	q := r.db.Order("created_at DESC")
+	if status != "" {
+		q = q.Where("status = ?", status)
+	}
+	return reps, q.Find(&reps).Error
+}
+
+func (r *Repository) UpdateReportStatus(id, status string) error {
+	return r.db.Model(&IncidentReport{}).Where("id = ?", id).
+		Updates(map[string]interface{}{"status": status, "updated_at": time.Now()}).Error
+}
+
+// ─── Strike & Ban ─────────────────────────────────────────────────────────────
+
+// AddStrike inserts a SOSStrike row, increments user strike count,
+// and auto-bans if count reaches 3. Returns (newCount, banned, error).
+func (r *Repository) AddStrike(userID, incidentID, reason, givenBy string) (int, bool, error) {
+	var strikeCount int
+	var banned bool
+
+	err := r.db.Transaction(func(tx *gorm.DB) error {
+		var incID *string
+		if incidentID != "" {
+			incID = &incidentID
+		}
+		var gby *string
+		if givenBy != "" {
+			gby = &givenBy
+		}
+		if err := tx.Create(&SOSStrike{
+			UserID: userID, IncidentID: incID, Reason: reason, GivenBy: gby,
+		}).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Model(map[string]interface{}{}).
+			Table("users").Where("id = ?", userID).
+			Update("sos_strike_count", gorm.Expr("sos_strike_count + 1")).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Table("users").Select("sos_strike_count").
+			Where("id = ?", userID).Scan(&strikeCount).Error; err != nil {
+			return err
+		}
+
+		if strikeCount >= 3 {
+			banned = true
+			if err := tx.Table("users").Where("id = ?", userID).
+				Updates(map[string]interface{}{"is_sos_banned": true}).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	return strikeCount, banned, err
+}
+
+func (r *Repository) IsSOSBanned(userID string) (bool, error) {
+	var count int64
+	err := r.db.Table("users").Where("id = ? AND is_sos_banned = true", userID).Count(&count).Error
+	return count > 0, err
+}
+
+func (r *Repository) GetStrikeCount(userID string) (int, error) {
+	var count int
+	err := r.db.Table("users").Select("sos_strike_count").Where("id = ?", userID).Scan(&count).Error
+	return count, err
+}
+
+// ─── Volunteer XP & Rank ──────────────────────────────────────────────────────
+
 func (r *Repository) CreateResponse(resp *IncidentResponse) error {
 	now := time.Now()
 	resp.AcceptedAt = &now
 	return r.db.Create(resp).Error
 }
 
-// GetReputation fetches a volunteer's reputation row (or nil if not found).
 func (r *Repository) GetReputation(userID string) (*VolunteerReputation, error) {
 	var rep VolunteerReputation
 	err := r.db.Where("user_id = ?", userID).First(&rep).Error
@@ -103,33 +172,22 @@ func (r *Repository) GetReputation(userID string) (*VolunteerReputation, error) 
 	return &rep, err
 }
 
-// UpsertReputation inserts or updates a volunteer's reputation row.
 func (r *Repository) UpsertReputation(userID string, addXP, addRescues int) (*VolunteerReputation, error) {
 	var rep VolunteerReputation
 	err := r.db.Where("user_id = ?", userID).First(&rep).Error
-
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		// Create new reputation row
-		rep = VolunteerReputation{
-			UserID:       userID,
-			ExpPoints:    addXP,
-			TotalRescues: addRescues,
-			UpdatedAt:    time.Now(),
-		}
+		rep = VolunteerReputation{UserID: userID, ExpPoints: addXP, TotalRescues: addRescues, UpdatedAt: time.Now()}
 		return &rep, r.db.Create(&rep).Error
 	}
 	if err != nil {
 		return nil, err
 	}
-
-	// Update existing row
 	rep.ExpPoints += addXP
 	rep.TotalRescues += addRescues
 	rep.UpdatedAt = time.Now()
 	return &rep, r.db.Save(&rep).Error
 }
 
-// GetRankForXP returns the highest rank whose min_exp does not exceed totalXP.
 func (r *Repository) GetRankForXP(totalXP int) (*MRank, error) {
 	var rank MRank
 	err := r.db.Where("min_exp <= ?", totalXP).Order("min_exp DESC").First(&rank).Error
@@ -139,11 +197,7 @@ func (r *Repository) GetRankForXP(totalXP int) (*MRank, error) {
 	return &rank, err
 }
 
-// UpdateRank sets the rank_id on a volunteer_reputation row.
 func (r *Repository) UpdateRank(userID string, rankID uint) error {
 	return r.db.Model(&VolunteerReputation{}).Where("user_id = ?", userID).
-		Updates(map[string]interface{}{
-			"rank_id":    rankID,
-			"updated_at": time.Now(),
-		}).Error
+		Updates(map[string]interface{}{"rank_id": rankID, "updated_at": time.Now()}).Error
 }

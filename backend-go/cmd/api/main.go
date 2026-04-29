@@ -103,9 +103,18 @@ func main() {
 	incidents := v1.Group("/incidents", authMw)
 	incidents.Get("/active", incidentHandler.GetActive)
 	incidents.Post("/trigger", incidentHandler.TriggerSOS)
+	incidents.Patch("/:id/type", incidentHandler.UpdateType)       // grace period pilih tipe
+	incidents.Post("/:id/broadcast", incidentHandler.Broadcast)    // grace period timeout
 	incidents.Post("/:id/cancel", incidentHandler.CancelSOS)
 	incidents.Put("/:id/location", incidentHandler.UpdateLocation)
+	incidents.Post("/:id/mark-false-alarm", incidentHandler.MarkFalseAlarm)
 	incidents.Post("/:id/resolve", incidentHandler.Resolve)
+
+	// Laporan Warga — Jalur B (non-darurat, butuh JWT)
+	reports := v1.Group("/reports", authMw)
+	reports.Post("", incidentHandler.CreateReport)
+	reports.Get("", incidentHandler.GetReports)
+	reports.Patch("/:id/status", incidentHandler.UpdateReportStatus)
 
 	// Telemetry (protected)
 	telemetry := v1.Group("/telemetry", authMw)

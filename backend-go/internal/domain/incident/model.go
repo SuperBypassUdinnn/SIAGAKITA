@@ -4,29 +4,60 @@ import "time"
 
 // ─── DB Models ────────────────────────────────────────────────────────────────
 
+// Incident merepresentasikan SOS darurat dari masyarakat (Jalur A).
 type Incident struct {
-	ID            uint       `gorm:"primaryKey;autoIncrement" json:"id"`
-	ReporterID    string     `gorm:"type:uuid;not null" json:"reporter_id"`
-	IncidentType  *string    `json:"incident_type,omitempty"`
-	Latitude      float64    `gorm:"not null" json:"latitude"`
-	Longitude     float64    `gorm:"not null" json:"longitude"`
-	Status        string     `gorm:"default:'grace_period'" json:"status"`
-	TriggerMethod string     `gorm:"default:'timeout'" json:"trigger_method"`
-	AddressDetail *string    `json:"address_detail,omitempty"`
-	CreatedAt     time.Time  `json:"created_at"`
-	UpdatedAt     time.Time  `json:"updated_at"`
-	ResolvedAt    *time.Time `json:"resolved_at,omitempty"`
+	ID                 string     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ReporterID         string     `gorm:"type:uuid;not null" json:"reporter_id"`
+	IncidentType       string     `gorm:"default:'unknown'" json:"incident_type"` // incident_category enum
+	Latitude           float64    `gorm:"not null" json:"latitude"`
+	Longitude          float64    `gorm:"not null" json:"longitude"`
+	Status             string     `gorm:"default:'grace_period'" json:"status"`
+	TriggerMethod      string     `gorm:"default:'user'" json:"trigger_method"` // 'user' | 'timeout'
+	UrgencyLevel       string     `gorm:"default:'critical'" json:"urgency_level"`
+	ReporterTrustLabel string     `gorm:"default:'standard'" json:"reporter_trust_label"` // 'verified'|'standard'|'unverified'
+	AddressDetail      *string    `json:"address_detail,omitempty"`
+	CreatedAt          time.Time  `json:"created_at"`
+	UpdatedAt          time.Time  `json:"updated_at"`
+	ResolvedAt         *time.Time `json:"resolved_at,omitempty"`
 }
 
+// IncidentReport merepresentasikan laporan warga non-darurat (Jalur B).
+type IncidentReport struct {
+	ID           string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	ReporterID   string    `gorm:"type:uuid;not null" json:"reporter_id"`
+	IncidentType string    `gorm:"not null" json:"incident_type"` // TIDAK boleh 'unknown'
+	Urgency      string    `gorm:"default:'low'" json:"urgency"`  // urgency_level enum
+	Latitude     float64   `gorm:"not null" json:"latitude"`
+	Longitude    float64   `gorm:"not null" json:"longitude"`
+	Description  *string   `json:"description,omitempty"`
+	PhotoURL     *string   `json:"photo_url,omitempty"`
+	AudioURL     *string   `json:"audio_url,omitempty"`
+	Status       string    `gorm:"default:'pending'" json:"status"` // pending|reviewed|actioned
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// SOSStrike adalah audit log setiap kali admin menandai false alarm.
+type SOSStrike struct {
+	ID         string    `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	UserID     string    `gorm:"type:uuid;not null" json:"user_id"`
+	IncidentID *string   `gorm:"type:uuid" json:"incident_id,omitempty"`
+	Reason     string    `json:"reason"`
+	GivenBy    *string   `gorm:"type:uuid" json:"given_by,omitempty"` // admin UUID
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+// IncidentResponse adalah respons relawan/instansi terhadap incident.
 type IncidentResponse struct {
-	ID          uint       `gorm:"primaryKey;autoIncrement" json:"id"`
-	IncidentID  uint       `gorm:"not null" json:"incident_id"`
+	ID          string     `gorm:"type:uuid;primaryKey;default:gen_random_uuid()" json:"id"`
+	IncidentID  string     `gorm:"type:uuid;not null" json:"incident_id"`
 	ResponderID string     `gorm:"type:uuid;not null" json:"responder_id"`
 	Status      string     `gorm:"default:'en_route'" json:"status"`
 	AcceptedAt  *time.Time `json:"accepted_at,omitempty"`
 	ArrivedAt   *time.Time `json:"arrived_at,omitempty"`
 }
 
+// VolunteerReputation menyimpan poin XP dan total rescue relawan.
 type VolunteerReputation struct {
 	UserID       string    `gorm:"type:uuid;primaryKey" json:"user_id"`
 	ExpPoints    int       `gorm:"default:0" json:"exp_points"`
@@ -44,26 +75,59 @@ type MRank struct {
 
 // ─── Request DTOs ─────────────────────────────────────────────────────────────
 
+// TriggerSOSRequest — Jalur A: hanya GPS wajib, tipe selalu mulai 'unknown'.
 type TriggerSOSRequest struct {
 	Latitude      float64 `json:"latitude"`
 	Longitude     float64 `json:"longitude"`
-	IncidentType  *string `json:"incident_type"`
-	AddressDetail *string `json:"address_detail"`
 	TriggerMethod string  `json:"trigger_method"` // 'user' | 'timeout'
 }
 
+// UpdateTypeRequest — dikirim dari grace period UI saat user memilih tipe.
+type UpdateTypeRequest struct {
+	IncidentType string `json:"incident_type"` // 'medical'|'fire'|'crime'|'rescue'|'general'
+}
+
+// UpdateLocationRequest — dikirim tiap 1 menit selama SOS aktif.
 type UpdateLocationRequest struct {
-	IncidentID uint    `json:"incident_id"`
+	IncidentID string  `json:"incident_id"`
 	Latitude   float64 `json:"latitude"`
 	Longitude  float64 `json:"longitude"`
 }
 
+// MarkFalseAlarmRequest — admin menandai insiden sebagai false alarm.
+type MarkFalseAlarmRequest struct {
+	Reason string `json:"reason"`
+}
+
+// CreateReportRequest — Jalur B: laporan warga non-darurat.
+type CreateReportRequest struct {
+	IncidentType string  `json:"incident_type"` // wajib, tidak boleh 'unknown'
+	Urgency      string  `json:"urgency"`       // 'low'|'medium'|'high'
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
+	Description  *string `json:"description"`
+	PhotoURL     *string `json:"photo_url"`
+	AudioURL     *string `json:"audio_url"`
+}
+
 // ─── Response DTOs ─────────────────────────────────────────────────────────────
 
+// TriggerSOSResponse dikirim ke Flutter setelah SOS berhasil dibuat.
 type TriggerSOSResponse struct {
-	IncidentID uint   `json:"incident_id"`
+	IncidentID string `json:"incident_id"`
 	Status     string `json:"status"`
 	Message    string `json:"message"`
+}
+
+// ActiveIncidentResponse — data SOS aktif milik reporter.
+type ActiveIncidentResponse struct {
+	IncidentID         string  `json:"incident_id"`
+	Status             string  `json:"status"`
+	IncidentType       string  `json:"incident_type"`
+	Latitude           float64 `json:"latitude"`
+	Longitude          float64 `json:"longitude"`
+	CreatedAt          string  `json:"created_at"`
+	ReporterTrustLabel string  `json:"reporter_trust_label"`
 }
 
 type ResolveResponse struct {
@@ -75,10 +139,10 @@ type ResolveResponse struct {
 	NewRank      string `json:"new_rank,omitempty"`
 }
 
-type ActiveIncidentResponse struct {
-	IncidentID uint    `json:"incident_id"`
-	Status     string  `json:"status"`
-	Latitude   float64 `json:"latitude"`
-	Longitude  float64 `json:"longitude"`
-	CreatedAt  string  `json:"created_at"`
+// FalseAlarmResponse dikirim setelah mark-false-alarm berhasil.
+type FalseAlarmResponse struct {
+	MarkedFalseAlarm bool   `json:"marked_false_alarm"`
+	StrikeCount      int    `json:"strike_count"`
+	UserBanned       bool   `json:"user_banned"`
+	Message          string `json:"message"`
 }

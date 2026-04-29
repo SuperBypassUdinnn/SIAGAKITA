@@ -22,8 +22,8 @@ import (
 
 const (
 	relawanGeoKey    = "relawan:locations"
-	incidentGraceKey = "incident:%d:grace"
-	incidentLocKey   = "incident:%d:loc"
+	incidentGraceKey = "incident:%s:grace"
+	incidentLocKey   = "incident:%s:loc"
 	gracePeriod      = 10 * time.Second
 )
 
@@ -150,10 +150,9 @@ func (h *Handler) onTriggerSOS(userID string, payload interface{}) {
 	ctx := context.Background()
 
 	// 1. Insert incident with status = grace_period
-	incidentType := "SOS"
 	inc := &incident.Incident{
 		ReporterID:   userID,
-		IncidentType: &incidentType,
+		IncidentType: "unknown",
 		Latitude:     lat,
 		Longitude:    lng,
 		Status:       "grace_period",
@@ -182,13 +181,12 @@ func (h *Handler) onTriggerSOS(userID string, payload interface{}) {
 		},
 	})
 
-	log.Printf("[WS] SOS triggered by user %s → incident #%d (grace %ds)", userID, inc.ID, int(gracePeriod.Seconds()))
+	log.Printf("[WS] SOS triggered by user %s → incident %s (grace %ds)", userID, inc.ID, int(gracePeriod.Seconds()))
 }
 
 func (h *Handler) onCancelSOS(userID string, payload interface{}) {
 	p := toMap(payload)
-	sosIDFloat, _ := p["sos_id"].(float64)
-	sosID := uint(sosIDFloat)
+	sosID, _ := p["sos_id"].(string)
 
 	ctx := context.Background()
 
@@ -204,13 +202,12 @@ func (h *Handler) onCancelSOS(userID string, payload interface{}) {
 		Payload: map[string]string{"message": "SOS dibatalkan"},
 	})
 
-	log.Printf("[WS] SOS #%d cancelled by user %s", sosID, userID)
+	log.Printf("[WS] SOS %s cancelled by user %s", sosID, userID)
 }
 
 func (h *Handler) onAcceptRescue(responderID string, payload interface{}) {
 	p := toMap(payload)
-	sosIDFloat, _ := p["sos_id"].(float64)
-	sosID := uint(sosIDFloat)
+	sosID, _ := p["sos_id"].(string)
 
 	// 1. Create incident_response record
 	resp := &incident.IncidentResponse{
@@ -219,7 +216,7 @@ func (h *Handler) onAcceptRescue(responderID string, payload interface{}) {
 		Status:      "en_route",
 	}
 	if err := h.incRepo.CreateResponse(resp); err != nil {
-		log.Printf("[WS] Failed to create response for incident #%d: %v", sosID, err)
+		log.Printf("[WS] Failed to create response for incident %s: %v", sosID, err)
 		return
 	}
 
@@ -230,7 +227,7 @@ func (h *Handler) onAcceptRescue(responderID string, payload interface{}) {
 	// 3. Get reporter ID from incident
 	inc, err := h.incRepo.FindByID(sosID)
 	if err != nil {
-		log.Printf("[WS] Incident #%d not found: %v", sosID, err)
+		log.Printf("[WS] Incident %s not found: %v", sosID, err)
 		return
 	}
 
@@ -245,7 +242,7 @@ func (h *Handler) onAcceptRescue(responderID string, payload interface{}) {
 		},
 	})
 
-	log.Printf("[WS] Rescue accepted: incident #%d ← relawan %s (%s)", sosID, responderID, responderName)
+	log.Printf("[WS] Rescue accepted: incident %s ← relawan %s (%s)", sosID, responderID, responderName)
 }
 
 // ─── Redis Expired Key Subscriber ─────────────────────────────────────────────
@@ -263,17 +260,19 @@ func (h *Handler) startExpiredKeySubscriber() {
 
 		for msg := range ch {
 			key := msg.Payload
-			// Only react to grace period keys: "incident:{id}:grace"
+			// Only react to grace period keys: "incident:{uuid}:grace"
 			if !strings.Contains(key, ":grace") {
 				continue
 			}
 
-			var incidentID uint
-			if _, err := fmt.Sscanf(key, "incident:%d:grace", &incidentID); err != nil {
+			// Extract UUID between "incident:" and ":grace"
+			key = strings.TrimPrefix(key, "incident:")
+			incidentID := strings.TrimSuffix(key, ":grace")
+			if incidentID == "" {
 				continue
 			}
 
-			log.Printf("[WS] Grace period expired for incident #%d → broadcasting SOS", incidentID)
+			log.Printf("[WS] Grace period expired for incident %s → broadcasting SOS", incidentID)
 			go h.broadcastSOS(incidentID)
 		}
 	}()
@@ -281,18 +280,18 @@ func (h *Handler) startExpiredKeySubscriber() {
 
 // broadcastSOS is called when the grace period expires.
 // It updates the incident status and sends INCOMING_EMERGENCY to nearby volunteers.
-func (h *Handler) broadcastSOS(incidentID uint) {
+func (h *Handler) broadcastSOS(incidentID string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// 1. Update incident status to active
-	_ = h.incRepo.UpdateStatus(incidentID, "active")
+	// 1. Update incident status to broadcasting
+	_ = h.incRepo.UpdateStatus(incidentID, "broadcasting")
 
 	// 2. Retrieve victim location from Redis
 	locKey := fmt.Sprintf(incidentLocKey, incidentID)
 	vals, err := h.rdb.HGetAll(ctx, locKey).Result()
 	if err != nil || len(vals) == 0 {
-		log.Printf("[WS] Location not found for incident #%d", incidentID)
+		log.Printf("[WS] Location not found for incident %s", incidentID)
 		return
 	}
 
@@ -309,7 +308,7 @@ func (h *Handler) broadcastSOS(incidentID uint) {
 		Sort:     "ASC",
 	}).Result()
 	if err != nil {
-		log.Printf("[WS] GeoRadius error for incident #%d: %v", incidentID, err)
+		log.Printf("[WS] GeoRadius error for incident #%s: %v", incidentID, err)
 		return
 	}
 
@@ -333,7 +332,7 @@ func (h *Handler) broadcastSOS(incidentID uint) {
 		}
 	}
 
-	log.Printf("[WS] SOS #%d broadcast to %d/%d online volunteers", incidentID, sent, len(volunteers))
+	log.Printf("[WS] SOS #%s broadcast to %d/%d online volunteers", incidentID, sent, len(volunteers))
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

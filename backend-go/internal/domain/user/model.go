@@ -16,6 +16,9 @@ type User struct {
 	IsVerifiedVolunteer bool       `gorm:"default:false" json:"is_verified_volunteer"`
 	IsEmailVerified     bool       `gorm:"default:false" json:"is_email_verified"`
 	IsPhoneVerified     bool       `gorm:"default:false" json:"is_phone_verified"`
+	SOSStrikeCount      int        `gorm:"default:0" json:"sos_strike_count"`
+	IsSOSBanned         bool       `gorm:"default:false" json:"is_sos_banned"`
+	BannedUntil         *time.Time `json:"banned_until,omitempty"`
 	CreatedAt           time.Time  `json:"created_at"`
 	UpdatedAt           time.Time  `json:"updated_at"`
 	DeletedAt           *time.Time `gorm:"index" json:"-"`
