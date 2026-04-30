@@ -86,9 +86,9 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToRegister() {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => const RegisterScreen()))
-        .then((_) {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const RegisterScreen())).then((_) {
       if (mounted) {
         _formKey.currentState?.reset();
         _emailController.clear();
@@ -174,7 +174,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text(
                       'Lupa sandi?'.tr(context),
                       style: TextStyle(
-                          color: primaryColor, fontWeight: FontWeight.bold),
+                        color: primaryColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -186,7 +188,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                     elevation: 5,
                     shadowColor: primaryColor.withValues(alpha: 0.5),
                   ),
@@ -195,12 +198,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2),
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : Text(
                           'Masuk'.tr(context),
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
                 const SizedBox(height: 24),
@@ -210,14 +217,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       'Belum punya akun?',
                       style: TextStyle(
-                          color: colors.onSurface.withValues(alpha: 0.6)),
+                        color: colors.onSurface.withValues(alpha: 0.6),
+                      ),
                     ),
                     TextButton(
                       onPressed: _goToRegister,
                       child: Text(
                         'Daftar di sini',
                         style: TextStyle(
-                            color: primaryColor, fontWeight: FontWeight.bold),
+                          color: primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -242,12 +252,14 @@ class _LoginScreenState extends State<LoginScreen> {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1), blurRadius: 20)
+              color: Colors.black.withValues(alpha: 0.1),
+              blurRadius: 20,
+            ),
           ],
         ),
         clipBehavior: Clip.antiAlias,
         child: Image.asset(
-          'lib/components/logo_siagakita.jpg',
+          'lib/components/logo_siagakita.png',
           fit: BoxFit.cover,
           errorBuilder: (_, e, s) =>
               Icon(Icons.shield, size: 55, color: primaryColor),
@@ -276,29 +288,33 @@ class _LoginScreenState extends State<LoginScreen> {
       validator: validator,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle:
-            TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
-        prefixIcon:
-            Icon(icon, color: colors.onSurface.withValues(alpha: 0.5)),
+        hintStyle: TextStyle(color: colors.onSurface.withValues(alpha: 0.4)),
+        prefixIcon: Icon(icon, color: colors.onSurface.withValues(alpha: 0.5)),
         suffixIcon: suffix,
         filled: true,
         fillColor: colors.surface,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
         enabledBorder: OutlineInputBorder(
-            borderRadius: r,
-            borderSide:
-                BorderSide(color: colors.onSurface.withValues(alpha: 0.15))),
+          borderRadius: r,
+          borderSide: BorderSide(
+            color: colors.onSurface.withValues(alpha: 0.15),
+          ),
+        ),
         focusedBorder: OutlineInputBorder(
-            borderRadius: r,
-            borderSide: BorderSide(color: primaryColor, width: 2)),
+          borderRadius: r,
+          borderSide: BorderSide(color: primaryColor, width: 2),
+        ),
         errorBorder: OutlineInputBorder(
-            borderRadius: r,
-            borderSide:
-                BorderSide(color: Colors.red.shade400, width: 1.5)),
+          borderRadius: r,
+          borderSide: BorderSide(color: Colors.red.shade400, width: 1.5),
+        ),
         focusedErrorBorder: OutlineInputBorder(
-            borderRadius: r,
-            borderSide: BorderSide(color: Colors.red.shade400, width: 2)),
+          borderRadius: r,
+          borderSide: BorderSide(color: Colors.red.shade400, width: 2),
+        ),
         errorStyle: const TextStyle(fontSize: 11, height: 1.3),
       ),
     );
