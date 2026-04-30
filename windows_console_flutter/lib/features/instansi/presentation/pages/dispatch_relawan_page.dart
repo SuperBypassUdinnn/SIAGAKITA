@@ -1,58 +1,30 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/services/ws_service.dart';
+
 class DispatchRelawanPage extends StatelessWidget {
-  const DispatchRelawanPage({super.key});
+  final String token;
+  final WsService ws;
+  const DispatchRelawanPage({super.key, required this.token, required this.ws});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: Card(
-            child: ListView(
-              padding: const EdgeInsets.all(12),
-              children: const [
-                ListTile(
-                  leading: CircleAvatar(child: Icon(Icons.person)),
-                  title: Text('Ahmad Fauzi'),
-                  subtitle: Text('Medis & First Aid • 0.8 km'),
-                  trailing: Chip(label: Text('Standby')),
-                ),
-                Divider(),
-                ListTile(
-                  leading: CircleAvatar(child: Icon(Icons.person)),
-                  title: Text('Siti Rahmah'),
-                  subtitle: Text('Evakuasi & SAR • 1.1 km'),
-                  trailing: Chip(label: Text('On Duty')),
-                ),
-              ],
-            ),
+    // TODO Sprint B.4 — full dispatch implementation
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.local_shipping_outlined, color: Colors.white24, size: 56),
+          SizedBox(height: 16),
+          Text('Dispatch Relawan', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+          SizedBox(height: 8),
+          Text(
+            'Halaman ini akan menampilkan daftar relawan online\ndan SOS yang perlu di-dispatch.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.white38, fontSize: 13),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Panel Dispatch', style: Theme.of(context).textTheme.titleMedium),
-                  const SizedBox(height: 12),
-                  const Text('Misi: Kecelakaan lalu lintas (SOS-9012)'),
-                  const Text('Lokasi: Lhoknga'),
-                  const SizedBox(height: 12),
-                  FilledButton.icon(
-                    onPressed: () {},
-                    icon: const Icon(Icons.send),
-                    label: const Text('Assign ke Relawan Terpilih'),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

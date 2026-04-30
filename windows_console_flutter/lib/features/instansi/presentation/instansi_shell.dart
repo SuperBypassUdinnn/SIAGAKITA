@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../core/services/ws_service.dart';
 import 'pages/dashboard_operasi_page.dart';
 import 'pages/dispatch_relawan_page.dart';
 import 'pages/laporan_masuk_page.dart';
@@ -15,7 +17,10 @@ enum InstansiMenu {
 }
 
 class InstansiShell extends StatefulWidget {
-  const InstansiShell({super.key});
+  final String token;
+  final WsService ws;
+
+  const InstansiShell({super.key, required this.token, required this.ws});
 
   @override
   State<InstansiShell> createState() => _InstansiShellState();
@@ -35,41 +40,48 @@ class _InstansiShellState extends State<InstansiShell> {
   Widget _resolvePage() {
     switch (_activeMenu) {
       case InstansiMenu.dashboard:
-        return const DashboardOperasiPage();
+        return DashboardOperasiPage(token: widget.token, ws: widget.ws);
       case InstansiMenu.sosAktif:
-        return const SosAktifPage();
+        return SosAktifPage(token: widget.token, ws: widget.ws);
       case InstansiMenu.laporanMasuk:
-        return const LaporanMasukPage();
+        return LaporanMasukPage(token: widget.token);
       case InstansiMenu.dispatchRelawan:
-        return const DispatchRelawanPage();
+        return DispatchRelawanPage(token: widget.token, ws: widget.ws);
       case InstansiMenu.petaOperasional:
-        return const PetaOperasionalPage();
+        return PetaOperasionalPage(token: widget.token, ws: widget.ws);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          _SideNavigation(
-            activeMenu: _activeMenu,
-            onSelected: (menu) => setState(() => _activeMenu = menu),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                _TopHeader(title: _titles[_activeMenu] ?? 'Instansi Console'),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: _resolvePage(),
-                  ),
-                ),
-              ],
+    return ChangeNotifierProvider.value(
+      value: widget.ws,
+      child: Scaffold(
+        body: Row(
+          children: [
+            _SideNavigation(
+              activeMenu: _activeMenu,
+              onSelected: (menu) => setState(() => _activeMenu = menu),
+              ws: widget.ws,
             ),
-          ),
-        ],
+            Expanded(
+              child: Column(
+                children: [
+                  _TopHeader(
+                    title: _titles[_activeMenu] ?? 'Instansi Console',
+                    ws: widget.ws,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: _resolvePage(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -79,10 +91,12 @@ class _SideNavigation extends StatelessWidget {
   const _SideNavigation({
     required this.activeMenu,
     required this.onSelected,
+    required this.ws,
   });
 
   final InstansiMenu activeMenu;
   final ValueChanged<InstansiMenu> onSelected;
+  final WsService ws;
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +153,26 @@ class _SideNavigation extends StatelessWidget {
                 onTap: () => onSelected(InstansiMenu.petaOperasional),
               ),
               const Spacer(),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Text(
-                  'Mode: Online (Dev)',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.circle,
+                      size: 9,
+                      color: ws.isConnected ? const Color(0xFF2EAF60) : Colors.red,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      ws.isConnected ? 'WS Connected' : 'Offline',
+                      style: const TextStyle(color: Colors.white70, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -200,9 +229,10 @@ class _NavItem extends StatelessWidget {
 }
 
 class _TopHeader extends StatelessWidget {
-  const _TopHeader({required this.title});
+  const _TopHeader({required this.title, required this.ws});
 
   final String title;
+  final WsService ws;
 
   @override
   Widget build(BuildContext context) {
@@ -220,25 +250,33 @@ class _TopHeader extends StatelessWidget {
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const Spacer(),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFFE9F8ED),
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.circle, size: 10, color: Color(0xFF2EAF60)),
-                SizedBox(width: 6),
-                Text(
-                  'Realtime Connected',
-                  style: TextStyle(
-                    color: Color(0xFF2EAF60),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
+          Consumer<WsService>(
+            builder: (_, ws, __) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: ws.isConnected
+                    ? const Color(0xFFE9F8ED)
+                    : const Color(0xFFFFE9E9),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.circle,
+                    size: 10,
+                    color: ws.isConnected ? const Color(0xFF2EAF60) : Colors.red,
                   ),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    ws.isConnected ? 'Realtime Connected' : 'Offline',
+                    style: TextStyle(
+                      color: ws.isConnected ? const Color(0xFF2EAF60) : Colors.red,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
